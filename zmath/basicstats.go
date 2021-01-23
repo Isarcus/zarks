@@ -27,7 +27,6 @@ func (data Set) To2D(to [][]float64) [][]float64 {
 			idx++
 		}
 	}
-
 	return to
 }
 
@@ -48,7 +47,7 @@ func (data Set) IndexOf(value float64) int {
 	return -1
 }
 
-// IndexOfClosest returns the index of the item closest to the desired value
+// IndexOfClosest returns the index of the item closest to the desired value. Assumes the Set is pre-sorted.
 func (data Set) IndexOfClosest(value float64) int {
 	idx := data.IndexOf(value)
 	if idx != -1 { // if data contains the exact value (yay)

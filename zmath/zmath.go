@@ -48,6 +48,13 @@ func NewVecInt(x, y int) VecInt {
 	return vi
 }
 
+var (
+	// V returns a new Vec
+	V = NewVec
+	// VI returns a new VecInt
+	VI = NewVecInt
+)
+
 // NewBox does what you think it does
 func NewBox(minX, minY, maxX, maxY float64) Box {
 	var b Box = Box{

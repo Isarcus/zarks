@@ -35,7 +35,7 @@ func (m Map) Clear(value float64) Map {
 	return m
 }
 
-// Zero wipes a map entirely, setting all values to 0
+// Zero wipes the called map entirely, setting all values to 0
 func (m Map) Zero() Map {
 	return m.Clear(0)
 }
@@ -577,4 +577,46 @@ func NewMapVec(bounds VecInt) MapVec {
 	}
 
 	return data
+}
+
+//                                //
+// - - - NEEDLESS ITERATION - - - //
+//                                //
+
+var iterhash = make(map[*float64]VecInt)
+
+// Iterate will iterate through a map if for some reason you really, Really, REALLY don't want to nest two for loops.
+// Use the syntax: for ok, ptr := m.Iterate(); ok; ok, ptr = m.Iterate()
+func (m Map) Iterate() (bool, *float64) {
+	var (
+		bounds  = m.Bounds()
+		zeroPtr = &(m[0][0])
+		nextPos = VecInt{}
+	)
+
+	// if first iteration
+	val, ok := iterhash[zeroPtr]
+	if !ok {
+		if bounds.X > 1 {
+			nextPos.X = 1
+		} else {
+			nextPos.Y = 1
+		}
+		iterhash[zeroPtr] = nextPos
+		return true, zeroPtr
+	}
+
+	if m.ContainsCoord(val) {
+		if val.X+1 >= bounds.X {
+			nextPos.Y = val.Y + 1
+		} else {
+			nextPos.X = val.X + 1
+			nextPos.Y = val.Y
+		}
+		iterhash[zeroPtr] = nextPos
+		return true, m.PtrTo(val)
+	}
+
+	delete(iterhash, zeroPtr)
+	return false, zeroPtr
 }
