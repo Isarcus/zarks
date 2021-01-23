@@ -40,7 +40,7 @@ func WriteBytes(f *os.File, bytes []byte) {
 
 }
 
-// SaveImage saves the image as a .png at the provided path
+// SaveImage saves the image as a PNG at the provided path
 func SaveImage(path string, img *image.RGBA) {
 	if FileExists(path) {
 		reader := bufio.NewReader(os.Stdin)
@@ -68,7 +68,7 @@ func SaveImage(path string, img *image.RGBA) {
 	fmt.Println("Image saved at ", path)
 }
 
-// SaveImageJPEG saves an image as a .jpg at the target location. Quality should range from 1 to 100 inclusive,
+// SaveImageJPEG saves an image as a JPEG at the target location. Quality should range from 1 to 100 inclusive,
 // but note that saving as a jpeg is never lossless.
 func SaveImageJPEG(path string, img *image.RGBA, quality int, checkIfExists bool) {
 	if checkIfExists && FileExists(path) {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"image"
 	"math"
-	"zarks/output"
+	"zarks/system"
 	"zarks/zmath/zbits"
 )
 
@@ -528,28 +528,28 @@ var ImageToMap = MapFromImage
 
 // Save saves a Map as binary data at the path specified. File ending should be .zmap
 func (m Map) Save(path string) {
-	f := output.CreateFile(path)
+	f := system.CreateFile(path)
 	defer f.Close()
 
 	// Header (64)
 	header := [64]byte{}
-	output.WriteBytes(f, header[:])
+	system.WriteBytes(f, header[:])
 
 	// Settings [8]
 	settings := [8]byte{}
-	output.WriteBytes(f, settings[:])
+	system.WriteBytes(f, settings[:])
 
 	// Dimensions (8)
 	var dimX = uint32(m.Bounds().X)
 	var dimY = uint32(m.Bounds().Y)
-	output.WriteBytes(f, zbits.Uint32ToBytes(dimX, zbits.LittleEndian))
-	output.WriteBytes(f, zbits.Uint32ToBytes(dimY, zbits.LittleEndian))
+	system.WriteBytes(f, zbits.Uint32ToBytes(dimX, zbits.LittleEndian))
+	system.WriteBytes(f, zbits.Uint32ToBytes(dimY, zbits.LittleEndian))
 
 	// Data (8n)
 	for x, row := range m {
 		for y := range row {
 			bits := math.Float64bits(m[x][y])
-			output.WriteBytes(f, zbits.Uint64ToBytes(bits, zbits.LittleEndian))
+			system.WriteBytes(f, zbits.Uint64ToBytes(bits, zbits.LittleEndian))
 		}
 	}
 }

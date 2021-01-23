@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// GetTimeAsString returns the current system time formatted as "[year.month.day] [hour.minute.second]""
+// GetTimeAsString returns the current system time formatted as "[year.month.day] [hour.minute.second]"
 func GetTimeAsString(t time.Time) string {
 	str := strconv.Itoa
 	bigTime := "[" + str(t.Year()) + "." + str(int(t.Month())) + "." + str(t.Day()) + "]"
