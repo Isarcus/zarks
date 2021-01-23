@@ -11,9 +11,9 @@ import (
 // Map is a set of 2D raster data, with some helpful member functions
 type Map [][]float64
 
-// NewMap returns a 2D array of float64 of the given dimensions, with all cells set to the given initial value
-func NewMap(dimensions VecInt, initValue float64) Map {
-	x, y := dimensions.X, dimensions.Y
+// NewMap returns a 2D array of float64 of the given bounds, with all cells set to the given initial value
+func NewMap(bounds VecInt, initValue float64) Map {
+	x, y := bounds.X, bounds.Y
 	data := make([][]float64, x)
 	for i := 0; i < x; i++ {
 		data[i] = make([]float64, y)
@@ -33,6 +33,11 @@ func (m Map) Clear(value float64) Map {
 		}
 	}
 	return m
+}
+
+// Zero wipes a map entirely, setting all values to 0
+func (m Map) Zero() Map {
+	return m.Clear(0)
 }
 
 // GetSum returns the sum of all map elements
@@ -269,7 +274,7 @@ func (m Map) CustomModAt(points []VecInt, modFunc func(float64) float64) Map {
 }
 
 // Copy returns a copy of the portion of the map specified by the min and max coordinates.
-// If min > max, a map with zero dimensions in either direction will be returned.
+// If min > max, a map with zero bounds in either direction will be returned.
 // If min or max exceed the bounds of the called map, any out-of-bounds coordinates will be set to zero.
 // To copy the entire map, do m.Copy(zmath.ZVI, m.Bounds()).
 func (m Map) Copy(min, max VecInt) Map {
@@ -494,7 +499,7 @@ type Color int
 
 // Colors
 const (
-	Red Color = iota
+	Red Color = iota // I don't really like having enumerated colors in the zmath package, but eh they can stay for now
 	Green
 	Blue
 	Black
@@ -539,7 +544,7 @@ func (m Map) Save(path string) {
 	settings := [8]byte{}
 	system.WriteBytes(f, settings[:])
 
-	// Dimensions (8)
+	// bounds (8)
 	var dimX = uint32(m.Bounds().X)
 	var dimY = uint32(m.Bounds().Y)
 	system.WriteBytes(f, zbits.Uint32ToBytes(dimX, zbits.LittleEndian))
@@ -559,24 +564,17 @@ func (m Map) Save(path string) {
 //                    //
 
 // MapVec is a container for a 2D array of vectors
-type MapVec struct {
-	Data   [][]Vec
-	Bounds VecInt
-}
+type MapVec [][]Vec
 
 // NewMapVec returns a zeroed MapVec of the given bounds
-func NewMapVec(dimensions VecInt) *MapVec {
-	x, y := dimensions.X, dimensions.Y
-	data := make([][]Vec, x)
-	for i := 0; i < x; i++ {
-		data[i] = make([]Vec, y)
-		for j := 0; j < y; j++ {
+func NewMapVec(bounds VecInt) MapVec {
+	data := make([][]Vec, bounds.X)
+	for i := 0; i < bounds.X; i++ {
+		data[i] = make([]Vec, bounds.Y)
+		for j := 0; j < bounds.Y; j++ {
 			data[i][j] = ZV
 		}
 	}
 
-	return &MapVec{
-		Data:   data,
-		Bounds: dimensions,
-	}
+	return data
 }

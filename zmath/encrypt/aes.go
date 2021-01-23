@@ -61,7 +61,8 @@ func Encrypt(a AES, message []byte) []byte {
 	return encodedMessage
 }
 
-// Decrypt will decrypt a message of any length.
+// Decrypt will decrypt a message of any length, but will (likely incorrectly) assume that any missing parts
+// of a data block are null
 func Decrypt(a AES, message []byte) []byte {
 	var (
 		blockSize      = a.BlockSize()

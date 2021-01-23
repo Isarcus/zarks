@@ -3,7 +3,7 @@ package print3d
 import (
 	"fmt"
 	"math"
-	"zarks/output"
+	"zarks/system"
 	"zarks/zmath"
 	"zarks/zmath/zbits"
 )
@@ -31,12 +31,7 @@ var normalZero = vec3{0, 0, 0}
 func MapToSTLData(data zmath.Map, title string, makeSolid bool) *STLData {
 	// First create the header data
 	header := [80]byte{}
-	for i := range title {
-		if i >= 80 {
-			break
-		}
-		header[i] = title[i]
-	}
+	copy(header[:], []byte(title))
 
 	// Get correct bounds
 	bounds := data.Bounds()
@@ -198,18 +193,18 @@ func MapToSTLData(data zmath.Map, title string, makeSolid bool) *STLData {
 
 // WriteSTLToBinary creates an STL file from an STLData struct.
 func WriteSTLToBinary(data *STLData, path string) {
-	f := output.CreateFile(path)
+	f := system.CreateFile(path)
 	defer f.Close()
 
 	// Write the header (80)
-	output.WriteBytes(f, data.Header[:])
+	system.WriteBytes(f, data.Header[:])
 
 	// Write the number of triangles (4)
-	output.WriteBytes(f, zbits.Uint32ToBytes(data.Length, zbits.LittleEndian))
+	system.WriteBytes(f, zbits.Uint32ToBytes(data.Length, zbits.LittleEndian))
 
 	// Write the triangle data (50n)
 	for _, tri := range data.Triangles {
-		output.WriteBytes(f, tri.toBytes())
+		system.WriteBytes(f, tri.toBytes())
 	}
 
 	fmt.Println("File saved at ", path)

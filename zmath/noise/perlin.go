@@ -30,9 +30,9 @@ func NewPerlinMap(cfg Config) zmath.Map {
 			for by := 0; by < int(boxesY); by++ {
 				// Generate random vectors
 				for _, cornerVec := range cornerVecs {
-					if vectors.Data[bx+int(cornerVec.X)][by+int(cornerVec.Y)] == zmath.ZV {
+					if vectors[bx+int(cornerVec.X)][by+int(cornerVec.Y)] == zmath.ZV {
 						theta := 2.0 * rand.Float64() * math.Pi
-						vectors.Data[bx+int(cornerVec.X)][by+int(cornerVec.Y)] = zmath.Vec{
+						vectors[bx+int(cornerVec.X)][by+int(cornerVec.Y)] = zmath.Vec{
 							X: math.Cos(theta),
 							Y: math.Sin(theta),
 						}
@@ -67,10 +67,10 @@ func NewPerlinMap(cfg Config) zmath.Map {
 							Y: dy / boxSize.Y,
 						}
 
-						dot00 := boxPos.Subtract(cornerVecs[0]).Dot(vectors.Data[bx][by])
-						dot10 := boxPos.Subtract(cornerVecs[1]).Dot(vectors.Data[bx+1][by])
-						dot11 := boxPos.Subtract(cornerVecs[2]).Dot(vectors.Data[bx+1][by+1])
-						dot01 := boxPos.Subtract(cornerVecs[3]).Dot(vectors.Data[bx][by+1])
+						dot00 := boxPos.Subtract(cornerVecs[0]).Dot(vectors[bx][by])
+						dot10 := boxPos.Subtract(cornerVecs[1]).Dot(vectors[bx+1][by])
+						dot11 := boxPos.Subtract(cornerVecs[2]).Dot(vectors[bx+1][by+1])
+						dot01 := boxPos.Subtract(cornerVecs[3]).Dot(vectors[bx][by+1])
 
 						x0 := interpolatePow5(dot00, dot10, boxPos.X)
 						x1 := interpolatePow5(dot01, dot11, boxPos.X)
