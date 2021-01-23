@@ -5,6 +5,7 @@ import (
 	"math"
 	"zarks/output"
 	"zarks/zmath"
+	"zarks/zmath/zbits"
 )
 
 type vec3 struct {
@@ -204,7 +205,7 @@ func WriteSTLToBinary(data *STLData, path string) {
 	output.WriteBytes(f, data.Header[:])
 
 	// Write the number of triangles (4)
-	output.WriteBytes(f, output.Uint32ToBytes(data.Length, output.LittleEndian))
+	output.WriteBytes(f, zbits.Uint32ToBytes(data.Length, zbits.LittleEndian))
 
 	// Write the triangle data (50n)
 	for _, tri := range data.Triangles {
@@ -219,7 +220,7 @@ func (t triangle) toBytes() []byte {
 	bytesV1 := t.v1.toBytes()
 	bytesV2 := t.v2.toBytes()
 	bytesV3 := t.v3.toBytes()
-	bytesAttributes := output.Uint16ToBytes(t.attributes, output.LittleEndian)
+	bytesAttributes := zbits.Uint16ToBytes(t.attributes, zbits.LittleEndian)
 
 	final := append(bytesNormal, bytesV1...)
 	final = append(final, bytesV2...)
@@ -233,11 +234,11 @@ func (v3 vec3) toBytes() []byte {
 	var bits uint32
 
 	bits = math.Float32bits(v3.X)
-	bytesX := output.Uint32ToBytes(bits, output.LittleEndian)
+	bytesX := zbits.Uint32ToBytes(bits, zbits.LittleEndian)
 	bits = math.Float32bits(v3.Y)
-	bytesY := output.Uint32ToBytes(bits, output.LittleEndian)
+	bytesY := zbits.Uint32ToBytes(bits, zbits.LittleEndian)
 	bits = math.Float32bits(v3.Z)
-	bytesZ := output.Uint32ToBytes(bits, output.LittleEndian)
+	bytesZ := zbits.Uint32ToBytes(bits, zbits.LittleEndian)
 
 	return append(append(bytesX, bytesY...), bytesZ...)
 }

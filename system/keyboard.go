@@ -1,4 +1,4 @@
-package input
+package system
 
 import (
 	"github.com/faiface/pixel"
@@ -38,7 +38,7 @@ const (
 	KeyW
 	KeyX
 	KeyY
-	KeyZ 
+	KeyZ
 	KeyEsc // 26
 	KeyCtrl
 
@@ -159,7 +159,7 @@ func (i *Input) JustPressed(keys ...KeyID) bool {
 	pressed := false
 
 	for _, k := range keys {
-		held = held && ToBool(i.Keys[k]) // all keys must currently be held/pressed
+		held = held && ToBool(i.Keys[k])            // all keys must currently be held/pressed
 		pressed = pressed || i.Keys[k] == IDPressed // at least one must have been JUST pressed
 	}
 	if !held || !pressed {

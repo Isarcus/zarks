@@ -5,6 +5,7 @@ import (
 	"image"
 	"math"
 	"zarks/output"
+	"zarks/zmath/zbits"
 )
 
 // Map is a set of 2D raster data, with some helpful member functions
@@ -541,14 +542,14 @@ func (m Map) Save(path string) {
 	// Dimensions (8)
 	var dimX = uint32(m.Bounds().X)
 	var dimY = uint32(m.Bounds().Y)
-	output.WriteBytes(f, output.Uint32ToBytes(dimX, output.LittleEndian))
-	output.WriteBytes(f, output.Uint32ToBytes(dimY, output.LittleEndian))
+	output.WriteBytes(f, zbits.Uint32ToBytes(dimX, zbits.LittleEndian))
+	output.WriteBytes(f, zbits.Uint32ToBytes(dimY, zbits.LittleEndian))
 
 	// Data (8n)
 	for x, row := range m {
 		for y := range row {
 			bits := math.Float64bits(m[x][y])
-			output.WriteBytes(f, output.Uint64ToBytes(bits, output.LittleEndian))
+			output.WriteBytes(f, zbits.Uint64ToBytes(bits, zbits.LittleEndian))
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package output
+package system
 
 import (
 	"bufio"
@@ -7,14 +7,13 @@ import (
 	"image/jpeg"
 	"image/png"
 	"os"
-	"zarks/input"
 )
 
 // CreateFile creates a file at the target location
 func CreateFile(path string) *os.File {
-	if input.FileExists(path) {
+	if FileExists(path) {
 		reader := bufio.NewReader(os.Stdin)
-		if !input.QueryYN(reader, "File at "+path+" already exists. Overwrite?") {
+		if !QueryYN(reader, "File at "+path+" already exists. Overwrite?") {
 			fmt.Println("Save aborted.")
 			return nil
 		}
@@ -43,9 +42,9 @@ func WriteBytes(f *os.File, bytes []byte) {
 
 // SaveImage saves the image as a .png at the provided path
 func SaveImage(path string, img *image.RGBA) {
-	if input.FileExists(path) {
+	if FileExists(path) {
 		reader := bufio.NewReader(os.Stdin)
-		if !input.QueryYN(reader, "File at "+path+" already exists. Overwrite?") {
+		if !QueryYN(reader, "File at "+path+" already exists. Overwrite?") {
 			fmt.Println("Save aborted.")
 			return
 		}
@@ -72,9 +71,9 @@ func SaveImage(path string, img *image.RGBA) {
 // SaveImageJPEG saves an image as a .jpg at the target location. Quality should range from 1 to 100 inclusive,
 // but note that saving as a jpeg is never lossless.
 func SaveImageJPEG(path string, img *image.RGBA, quality int, checkIfExists bool) {
-	if checkIfExists && input.FileExists(path) {
+	if checkIfExists && FileExists(path) {
 		reader := bufio.NewReader(os.Stdin)
-		if !input.QueryYN(reader, "File at "+path+" already exists. Overwrite?") {
+		if !QueryYN(reader, "File at "+path+" already exists. Overwrite?") {
 			fmt.Println("Save aborted.")
 			return
 		}
