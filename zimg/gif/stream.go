@@ -3,8 +3,8 @@ package gif
 import (
 	"fmt"
 	"math"
-	"zarks/output"
 	"zarks/zmath"
+	"zarks/zmath/zbits"
 )
 
 // MaxTableSize is the maximum code table size allowed by GIFs
@@ -101,7 +101,7 @@ func getCode(num int) Code {
 }
 
 func getBytes(num int) []byte {
-	bits := output.Uint16ToBytes(uint16(num), output.BigEndian)
+	bits := zbits.Uint16ToBytes(uint16(num), zbits.BigEndian)
 	bytes := []byte{
 		bits[0],
 		bits[1],

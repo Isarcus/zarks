@@ -201,6 +201,31 @@ func (m Map) FlipHorizontal() Map {
 	return m
 }
 
+// RotateCW90 rotates a map clockwise, 90 degrees. If the called map is square, the underlying array will be used.
+// Otherwise, a new Map will be created and the original discarded.
+// func (m Map) RotateCW90() Map {
+// 	bounds := m.Bounds()
+
+// 	// if square
+// 	if bounds.X == bounds.Y {
+
+// 	} else {
+// 		newBounds := VecInt{
+// 			X: bounds.Y,
+// 			Y: bounds.X,
+// 		}
+// 		rotated := NewMap(newBounds, 0)
+
+// 		for x, row := range m {
+// 			for y := range row {
+// 				rotated[y][x]
+// 			}
+// 		}
+// 	}
+
+// 	return m
+// }
+
 // SetMin sets every value in the map that is less than the passed value TO the passed value.
 // This function does *NOT* interpolate the map between its maximum and a new minimum.
 func (m Map) SetMin(value float64) Map {
@@ -276,7 +301,7 @@ func (m Map) CustomModAt(points []VecInt, modFunc func(float64) float64) Map {
 // Copy returns a copy of the portion of the map specified by the min and max coordinates.
 // If min > max, a map with zero bounds in either direction will be returned.
 // If min or max exceed the bounds of the called map, any out-of-bounds coordinates will be set to zero.
-// To copy the entire map, do m.Copy(zmath.ZVI, m.Bounds()).
+// To copy the entire map, use `m.Copy(zmath.ZVI, m.Bounds())`.
 func (m Map) Copy(min, max VecInt) Map {
 	var dim = VecInt{}
 	if max.X > min.X && max.Y > min.Y {
@@ -586,7 +611,8 @@ func NewMapVec(bounds VecInt) MapVec {
 var iterhash = make(map[*float64]VecInt)
 
 // Iterate will iterate through a map if for some reason you really, Really, REALLY don't want to nest two for loops.
-// Use the syntax: for ok, ptr := m.Iterate(); ok; ok, ptr = m.Iterate()
+// Use the syntax: `for ok, ptr := m.Iterate(); ok; ok, ptr = m.Iterate()`. This is exponentially slower than
+// looping through a 2D array the traditional way, but I just wanted to see if this was possible :-)
 func (m Map) Iterate() (bool, *float64) {
 	var (
 		bounds  = m.Bounds()

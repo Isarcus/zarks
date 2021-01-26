@@ -61,8 +61,8 @@ type Input struct {
 	Keys     [KeyCt]ButtonState
 }
 
-func inputLogic(prev ButtonState, now bool) ButtonState {
-	if now { // if currently pressed
+func inputLogic(prev ButtonState, curr bool) ButtonState {
+	if curr { // if currently pressed
 		switch prev {
 		case IDPressed:
 			return IDHeld
@@ -98,7 +98,8 @@ func ToBool(state ButtonState) bool {
 
 // GetInput extracts input from a Window and returns it
 func GetInput(win *pixelgl.Window, prev Input) Input {
-	prev.Keys[KeyA] = inputLogic(prev.Keys[KeyA], win.Pressed(pixelgl.KeyA)) // this is cumbersome
+	// this is incredibly cumbersome; maybe eventually switch to doing this with bitlogic
+	prev.Keys[KeyA] = inputLogic(prev.Keys[KeyA], win.Pressed(pixelgl.KeyA))
 	prev.Keys[KeyB] = inputLogic(prev.Keys[KeyB], win.Pressed(pixelgl.KeyB))
 	prev.Keys[KeyC] = inputLogic(prev.Keys[KeyC], win.Pressed(pixelgl.KeyC))
 	prev.Keys[KeyD] = inputLogic(prev.Keys[KeyD], win.Pressed(pixelgl.KeyD))
@@ -154,6 +155,8 @@ func BlankInput() Input {
 // JustPressed tells you if a specific combination of keys has just been pressed.
 // They need not all have been pressed at the same time, but at least one of them must
 // be equal to IDPressed while the others can either be IDPressed or IDHeld to return true.
+// Useful examples of this is testing for something like Ctrl+C or Shift+F3, or just single presses
+// like one would use for typing.
 func (i *Input) JustPressed(keys ...KeyID) bool {
 	held := true
 	pressed := false
@@ -162,7 +165,7 @@ func (i *Input) JustPressed(keys ...KeyID) bool {
 		held = held && ToBool(i.Keys[k])            // all keys must currently be held/pressed
 		pressed = pressed || i.Keys[k] == IDPressed // at least one must have been JUST pressed
 	}
-	if !held || !pressed {
+	if !(held && pressed) {
 		return false
 	}
 

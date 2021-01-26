@@ -25,11 +25,11 @@ func CreateFile(path string) *os.File {
 	return file
 }
 
-// WriteBytes writes the passed bytes to the file, trying up to 10 times to write all the bytes
+// WriteBytes writes the passed bytes to the file, trying up to 2 more times to write all the bytes
 func WriteBytes(f *os.File, bytes []byte) {
 	written := 0
 	tries := 0
-	for written < len(bytes) && tries < 10 {
+	for written < len(bytes) && tries < 2 {
 		l, err := f.Write(bytes[written:len(bytes)])
 		written += l
 		if err != nil {

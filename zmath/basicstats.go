@@ -230,7 +230,8 @@ func PrintAnalysis(a *Analysis) {
 	fmt.Println("Std:      ", a.Std)
 }
 
-// PrintBasicHistogram prints out what percentages of the dataset are within certain histogram ranges
+// PrintBasicHistogram prints out what percentages of the dataset are within certain histogram ranges.
+// Use on a noise map (simplex, perlin, etc.) for some interesting insights!
 func (data Set) PrintBasicHistogram() {
 	sorted := make(Set, len(data))
 	copy(sorted, data)

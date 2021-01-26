@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"zarks/output"
+	"zarks/system"
 	"zarks/zimg"
 	"zarks/zmath"
+	"zarks/zmath/zbits"
 )
 
 type version string
@@ -64,8 +65,8 @@ func NewGIF(bounds zmath.VecInt, v version, pal Pallete) *GIF {
 	// II. LOGICAL SCREEN DESCRIPTOR //
 	//-------------------------------//
 	var (
-		width  = output.Uint16ToBytes(uint16(bounds.X), output.LittleEndian)
-		height = output.Uint16ToBytes(uint16(bounds.Y), output.LittleEndian)
+		width  = zbits.Uint16ToBytes(uint16(bounds.X), zbits.LittleEndian)
+		height = zbits.Uint16ToBytes(uint16(bounds.Y), zbits.LittleEndian)
 		desc   = [7]byte{}
 	)
 	desc[0] = width[0]
@@ -219,21 +220,21 @@ func (gif *GIF) AddFrame(img *image.RGBA) bool {
 
 // Save saves a GIF!
 func (gif *GIF) Save(path string) {
-	f := output.CreateFile(path)
+	f := system.CreateFile(path)
 	defer f.Close()
 
-	output.WriteBytes(f, gif.header[:])
-	output.WriteBytes(f, gif.descriptor[:])
-	output.WriteBytes(f, gif.colorTable[:])
+	system.WriteBytes(f, gif.header[:])
+	system.WriteBytes(f, gif.descriptor[:])
+	system.WriteBytes(f, gif.colorTable[:])
 	if gif.header[4] == "9"[0] { // if version 89a, include loop extension
 		fmt.Println("[GIF89a] Loop extension added.")
-		output.WriteBytes(f, gif.loopControl[:])
+		system.WriteBytes(f, gif.loopControl[:])
 	}
 
 	for _, frame := range gif.frames {
-		output.WriteBytes(f, frame.descriptor[:])
-		output.WriteBytes(f, frame.data[:])
+		system.WriteBytes(f, frame.descriptor[:])
+		system.WriteBytes(f, frame.data[:])
 	}
 
-	output.WriteBytes(f, []byte{Trailer})
+	system.WriteBytes(f, []byte{Trailer})
 }
