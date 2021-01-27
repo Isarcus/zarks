@@ -25,6 +25,29 @@ func NewMap(bounds VecInt, initValue float64) Map {
 	return data
 }
 
+// At returns the value of the map at the coordinates specified by the passed VecInt. It does NOT bounds-check!
+func (m Map) At(pos VecInt) float64 {
+	return m[pos.X][pos.Y]
+}
+
+// Set sets the point in the map at the desired coordinates to the passed value
+func (m Map) Set(pos VecInt, value float64) {
+	m[pos.X][pos.Y] = value
+}
+
+// PtrTo returns a pointer to the map index at the desired coordinates
+func (m Map) PtrTo(pos VecInt) *float64 {
+	return &(m[pos.X][pos.Y])
+}
+
+// Bounds returns the bounds of a map
+func (m Map) Bounds() VecInt {
+	return VecInt{
+		X: len(m),
+		Y: len(m[0]),
+	}
+}
+
 // Clear sets all points on the map equal to the passed value
 func (m Map) Clear(value float64) Map {
 	for x, row := range m {
@@ -391,29 +414,6 @@ func (m Map) ToLinear() Set {
 		linear = append(linear, m[i]...)
 	}
 	return linear
-}
-
-// At returns the value of the map at the coordinates specified by the passed VecInt. It does NOT bounds-check!
-func (m Map) At(pos VecInt) float64 {
-	return m[pos.X][pos.Y]
-}
-
-// Set sets the point in the map at the desired coordinates to the passed value
-func (m Map) Set(pos VecInt, value float64) {
-	m[pos.X][pos.Y] = value
-}
-
-// PtrTo returns a pointer to the map index at the desired coordinates
-func (m Map) PtrTo(pos VecInt) *float64 {
-	return &(m[pos.X][pos.Y])
-}
-
-// Bounds returns the bounds of a map
-func (m Map) Bounds() VecInt {
-	return VecInt{
-		X: len(m),
-		Y: len(m[0]),
-	}
 }
 
 // ContainsCoord tells you whether the specified coordinate is inside the called map
