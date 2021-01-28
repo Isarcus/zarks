@@ -194,7 +194,7 @@ func (m Map) Interpolate(newMin, newMax float64) Map {
 	return m
 }
 
-// FlipVertical flips the map vertically.
+// FlipVertical flips the map across its X-axis..
 func (m Map) FlipVertical() Map {
 	for x, row := range m {
 		maxY := m.Bounds().Y - 1
@@ -209,7 +209,7 @@ func (m Map) FlipVertical() Map {
 	return m
 }
 
-// FlipHorizontal flips the map horizontally.
+// FlipHorizontal flips the map across its Y-axis.
 func (m Map) FlipHorizontal() Map {
 	maxX := m.Bounds().X - 1
 	for x, row := range m {

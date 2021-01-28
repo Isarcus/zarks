@@ -1,8 +1,6 @@
 package zaudio
 
-import (
-	"zarks/output"
-)
+import "zarks/system"
 
 // FileFormat is a type for file formats
 type FileFormat int
@@ -49,8 +47,8 @@ func SaveAudioFile(af AudioFile, path string) {
 		path += ".wav"
 	}
 
-	f := output.CreateFile(path)
+	f := system.CreateFile(path)
 	defer f.Close()
 
-	output.WriteBytes(f, af.GetData())
+	system.WriteBytes(f, af.GetData())
 }
