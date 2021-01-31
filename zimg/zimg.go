@@ -3,6 +3,8 @@ package zimg
 import (
 	"image"
 	"image/color"
+	"math"
+	"zarks/system"
 	"zarks/zmath"
 )
 
@@ -16,9 +18,9 @@ var (
 // ZImage is an RGBA image with 64-bit floating point accuracy for each color. It also has some really cool functions.
 // Expect to need about 32 MB of RAM for a 1000x1000 ZImage.
 type ZImage struct {
-	RGBA  [4]zmath.Map // zmath.Map representations of the image
-	rep32 *image.RGBA  // a typical, 32-bit color representation of an image
-	ptr   zptr
+	RGBA256 [4]zmath.Map // zmath.Map representations of the image
+	RGBA32  *image.RGBA  // a typical, 32-bit color representation of an image
+	ptr     zptr
 }
 
 // zptr is used to point to a rectangular section of a ZImage. (TODO)
@@ -43,9 +45,9 @@ func NewZImage(bounds zmath.VecInt) *ZImage {
 		area:   zmath.R(zmath.ZVI, bounds),
 	}
 	return &ZImage{
-		RGBA:  rgba,
-		rep32: rep32,
-		ptr:   src,
+		RGBA256: rgba,
+		RGBA32:  rep32,
+		ptr:     src,
 	}
 }
 
@@ -61,6 +63,11 @@ func ZImageFromRGBA(img *image.RGBA) *ZImage {
 	}
 
 	return zi
+}
+
+// ZImageFromPath loads a ZImage from the file at the specified path.
+func ZImageFromPath(path string) *ZImage {
+	return ZImageFromRGBA(ImageToRGBA(system.LoadImage(path))) // basically so you don't have to type all this
 }
 
 // Src returns the underlying source ZImage of a ZImage (or itself, if it is not a reference.)
@@ -79,38 +86,63 @@ func (zi *ZImage) Original() bool {
 // At returns the color at the desired location
 func (zi *ZImage) At(pos zmath.VecInt) color.RGBA {
 	return color.RGBA{
-		R: uint8(zi.RGBA[R].At(pos)),
-		G: uint8(zi.RGBA[G].At(pos)),
-		B: uint8(zi.RGBA[B].At(pos)),
-		A: uint8(zi.RGBA[A].At(pos)),
+		R: uint8(zi.RGBA256[R].At(pos)),
+		G: uint8(zi.RGBA256[G].At(pos)),
+		B: uint8(zi.RGBA256[B].At(pos)),
+		A: uint8(zi.RGBA256[A].At(pos)),
 	}
 }
 
 // RedAt returns the Red value at the desired location
-func (zi *ZImage) RedAt(pos zmath.VecInt) float64 { return zi.RGBA[Red].At(pos) }
+func (zi *ZImage) RedAt(pos zmath.VecInt) float64 { return zi.RGBA256[Red].At(pos) }
 
 // GreenAt returns the Red value at the desired location
-func (zi *ZImage) GreenAt(pos zmath.VecInt) float64 { return zi.RGBA[Green].At(pos) }
+func (zi *ZImage) GreenAt(pos zmath.VecInt) float64 { return zi.RGBA256[Green].At(pos) }
 
 // BlueAt returns the Red value at the desired location
-func (zi *ZImage) BlueAt(pos zmath.VecInt) float64 { return zi.RGBA[Blue].At(pos) }
+func (zi *ZImage) BlueAt(pos zmath.VecInt) float64 { return zi.RGBA256[Blue].At(pos) }
 
 // AlphaAt returns the Red value at the desired location
-func (zi *ZImage) AlphaAt(pos zmath.VecInt) float64 { return zi.RGBA[Alpha].At(pos) }
+func (zi *ZImage) AlphaAt(pos zmath.VecInt) float64 { return zi.RGBA256[Alpha].At(pos) }
 
 // Set sets the color at the desired location
-func (zi *ZImage) Set(pos zmath.VecInt, col color.Color) *ZImage {
-	c := toUint8(col)
-	for i, m := range zi.RGBA {
-		m.Set(pos, float64(c[i]))
+func (zi *ZImage) Set(pos zmath.VecInt, col color.RGBA) *ZImage {
+	zi.RGBA256[R].Set(pos, float64(col.R))
+	zi.RGBA256[G].Set(pos, float64(col.G))
+	zi.RGBA256[B].Set(pos, float64(col.B))
+	zi.RGBA256[A].Set(pos, float64(col.A))
+	return zi
+}
+
+// ScaleDim scales the ZImage proportionally by the provided factor
+func (zi *ZImage) ScaleDim(by float64) *ZImage {
+	for i, m := range zi.RGBA256 {
+		zi.RGBA256[i] = m.ScaleDim(by)
 	}
+	zi.RGBA32 = image.NewRGBA(image.Rect(0, 0, zi.Bounds().X, zi.Bounds().Y))
+	zi.Update()
+	return zi
+}
+
+// SetMaxBounds scales the ZImage proportionally so that it will be within the new maximum bounds.
+// If bounds larger than the current bounds are provided, nothing will be changed.
+func (zi *ZImage) SetMaxBounds(newMax zmath.VecInt) *ZImage {
+	var (
+		bounds = zi.Bounds()
+		xScale = float64(newMax.X) / float64(bounds.X)
+		yScale = float64(newMax.Y) / float64(bounds.Y)
+	)
+	if xScale < 1 || yScale < 1 {
+		zi.ScaleDim(math.Min(xScale, yScale))
+	}
+
 	return zi
 }
 
 // Clear sets every pixel in the ZImage to the desired color
 func (zi *ZImage) Clear(col color.Color) *ZImage {
 	c := toUint8(col)
-	for i, m := range zi.RGBA {
+	for i, m := range zi.RGBA256 {
 		m.Clear(float64(c[i]))
 	}
 	return zi
@@ -124,7 +156,7 @@ func (zi *ZImage) Zero() *ZImage {
 
 // BlurGaussian blurs gaussianly! (and very slowly, unfortunately)
 func (zi *ZImage) BlurGaussian(radius int) *ZImage {
-	for _, m := range zi.RGBA {
+	for _, m := range zi.RGBA256 {
 		m.BlurGaussian(radius)
 	}
 	return zi
@@ -132,7 +164,7 @@ func (zi *ZImage) BlurGaussian(radius int) *ZImage {
 
 // Bounds returns the bounds of the ZImage!
 func (zi *ZImage) Bounds() zmath.VecInt {
-	return zi.RGBA[Red].Bounds()
+	return zi.RGBA256[Red].Bounds()
 }
 
 // Update refreshes the underlying 32-bit representation of the image
@@ -146,7 +178,7 @@ func (zi *ZImage) Update() *ZImage {
 				B: uint8(zi.BlueAt(zmath.VI(x, y))),
 				A: uint8(zi.AlphaAt(zmath.VI(x, y))),
 			}
-			zi.rep32.Set(x, y, c)
+			zi.RGBA32.Set(x, y, c)
 		}
 	}
 	return zi
@@ -157,12 +189,12 @@ func (zi *ZImage) Update() *ZImage {
 func (zi *ZImage) Interpolate(newMin, newMax float64, onColors ...ColorType) *ZImage {
 	if len(onColors) == 0 {
 		for _, m := range ColorsRGB {
-			zi.RGBA[m].Interpolate(newMin, newMax)
+			zi.RGBA256[m].Interpolate(newMin, newMax)
 		}
 		return zi
 	}
 	for _, m := range onColors {
-		zi.RGBA[m].Interpolate(newMin, newMax)
+		zi.RGBA256[m].Interpolate(newMin, newMax)
 	}
 	return zi
 }
@@ -172,12 +204,12 @@ func (zi *ZImage) Interpolate(newMin, newMax float64, onColors ...ColorType) *ZI
 func (zi *ZImage) FlipHorizontal(onColors ...ColorType) *ZImage {
 	if len(onColors) == 0 {
 		for _, m := range ColorsAll {
-			zi.RGBA[m].FlipHorizontal()
+			zi.RGBA256[m].FlipHorizontal()
 		}
 		return zi
 	}
 	for _, m := range onColors {
-		zi.RGBA[m].FlipHorizontal()
+		zi.RGBA256[m].FlipHorizontal()
 	}
 	return zi
 }
@@ -187,12 +219,12 @@ func (zi *ZImage) FlipHorizontal(onColors ...ColorType) *ZImage {
 func (zi *ZImage) FlipVertical(onColors ...ColorType) *ZImage {
 	if len(onColors) == 0 {
 		for _, m := range ColorsAll {
-			zi.RGBA[m].FlipVertical()
+			zi.RGBA256[m].FlipVertical()
 		}
 		return zi
 	}
 	for _, m := range onColors {
-		zi.RGBA[m].FlipVertical()
+		zi.RGBA256[m].FlipVertical()
 	}
 	return zi
 }
@@ -239,4 +271,32 @@ func (zi *ZImage) CustomMod(modFunc func(color.RGBA) color.RGBA) *ZImage {
 		}
 	}
 	return zi
+}
+
+// CustomModAt lets you pass in any function that takes in a color.RGBA and returns a color.RGBA, which it
+// then applies to the specified pixels in the ZImage.
+func (zi *ZImage) CustomModAt(modFunc func(color.RGBA) color.RGBA, at []zmath.VecInt) *ZImage {
+	for _, pt := range at {
+		zi.Set(pt, modFunc(zi.At(pt)))
+	}
+	return zi
+}
+
+// Save saves an image!
+func (zi *ZImage) Save(path string) {
+	zi.Update()
+	system.SaveImage(path, zi.RGBA32)
+}
+
+// GetGrayscale returns an image.RGBA grayscale of the current ZImage, without modifying the underlying ZImage.
+func (zi *ZImage) GetGrayscale() *image.RGBA {
+	bounds := zi.Bounds()
+	gs := image.NewRGBA(image.Rect(0, 0, bounds.X, bounds.Y))
+	for x := 0; x < bounds.X; x++ {
+		for y := 0; y < bounds.Y; y++ {
+			bright := uint8(BrightnessOf(zi.At(zmath.VI(x, y))) * 255.0)
+			gs.Set(x, y, color.RGBA{bright, bright, bright, 255})
+		}
+	}
+	return gs
 }

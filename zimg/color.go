@@ -53,6 +53,11 @@ func toUint8(c color.Color) [4]uint8 {
 	return [4]uint8{col32.R, col32.G, col32.B, col32.A}
 }
 
+// BrightnessOf returns the unweighted brightness of a color. It does not take Alpha into account.
+func BrightnessOf(c color.RGBA) float64 {
+	return (float64(c.R) + float64(c.G) + float64(c.B)) / 765.0
+}
+
 // DistanceToColor returns the euclidean "distance" between two colors. It does NOT take alpha into account!
 func DistanceToColor(c1, c2 color.RGBA) float64 {
 	var (
@@ -229,7 +234,7 @@ func CustomSmoothScheme(colors ColorSetSmooth, thresholds ThresholdSetSmooth) Co
 				)
 			}
 		}
-		fmt.Println(value)
+		fmt.Println("Error in CustomSmoothScheme for value:", value)
 		return color.RGBA{}
 	}
 

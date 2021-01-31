@@ -134,6 +134,20 @@ func (m Map) Subtract(subtrahend float64) Map {
 	return m
 }
 
+// ScaleDim scales a map's dimensions by an amount. For example, scaling by 2 will double an image's dimensions.
+// This will lose data when shrinking an image
+func (m Map) ScaleDim(by float64) Map {
+	newBounds := m.Bounds().V().Scale(by).VI()
+	newMap := NewMap(newBounds, 0)
+	inv := 1.0 / by
+	for x, row := range newMap {
+		for y := range row {
+			newMap[x][y] = m.At(VI(x, y).V().Scale(inv).VI())
+		}
+	}
+	return newMap
+}
+
 // Multiply every data point by the passed value
 func (m Map) Multiply(multiplicand float64) Map {
 	for x, row := range m {
@@ -321,7 +335,7 @@ func (m Map) CustomModAt(points []VecInt, modFunc func(float64) float64) Map {
 	return m
 }
 
-// Copy returns a copy of the portion of the map specified by the min and max coordinates.
+// Copy returns a deepcopy of the portion of the map specified by the min and max coordinates.
 // If min > max, a map with zero bounds in either direction will be returned.
 // If min or max exceed the bounds of the called map, any out-of-bounds coordinates will be set to zero.
 // To copy the entire map, use `m.Copy(zmath.ZVI, m.Bounds())`.
@@ -348,6 +362,12 @@ func (m Map) Copy(min, max VecInt) Map {
 	}
 
 	return copyMap
+}
+
+// CopyAll deepcopies an entire map and returns the copy.
+// Equivalent to calling the Copy() function for a map's entire area.
+func (m Map) CopyAll() Map {
+	return m.Copy(ZVI, m.Bounds())
 }
 
 // Paste pastes all of the data from pasteMe into a map, starting at the specified coordinate in the called map.
