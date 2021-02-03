@@ -48,6 +48,12 @@ func (m Map) Bounds() VecInt {
 	}
 }
 
+// Area returns the area of the map as determined by its width and height.
+func (m Map) Area() float64 {
+	b := m.Bounds()
+	return float64(b.X * b.Y)
+}
+
 // Clear sets all points on the map equal to the passed value
 func (m Map) Clear(value float64) Map {
 	for x, row := range m {
@@ -573,7 +579,7 @@ func MapFromImage(img *image.RGBA, color Color) Map {
 	return imgMap
 }
 
-// ImageToMap is identical to MapFromImage
+// ImageToMap returns a map of the R, G, B, or brightness values of an image
 var ImageToMap = MapFromImage
 
 // Save saves a Map as binary data at the path specified. File ending should be .zmap

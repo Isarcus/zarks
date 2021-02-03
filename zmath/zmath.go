@@ -42,22 +42,6 @@ func (v Vec) Add(addend Vec) Vec {
 	}
 }
 
-// Add adds
-func (vi VecInt) Add(addend VecInt) VecInt {
-	return VecInt{
-		X: vi.X + addend.X,
-		Y: vi.Y + addend.Y,
-	}
-}
-
-// AddXY adds
-func (vi VecInt) AddXY(x, y int) VecInt {
-	return VecInt{
-		X: vi.X + x,
-		Y: vi.Y + y,
-	}
-}
-
 // Subtract subtracts
 func (v Vec) Subtract(subtrahend Vec) Vec {
 	return Vec{
@@ -119,6 +103,32 @@ func (vi VecInt) ToFloat64() Vec {
 // V converts a VecInt to a Vec
 func (vi VecInt) V() Vec {
 	return vi.ToFloat64()
+}
+
+// Add adds
+func (vi VecInt) Add(addend VecInt) VecInt {
+	return VecInt{
+		X: vi.X + addend.X,
+		Y: vi.Y + addend.Y,
+	}
+}
+
+// AddXY adds
+func (vi VecInt) AddXY(x, y int) VecInt {
+	return VecInt{
+		X: vi.X + x,
+		Y: vi.Y + y,
+	}
+}
+
+// Min returns the minimum of a VecInt's two components
+func (vi VecInt) Min() int {
+	return MinInt(vi.X, vi.Y)
+}
+
+// Max returns the maximum of a VecInt's two components
+func (vi VecInt) Max() int {
+	return MaxInt(vi.X, vi.Y)
 }
 
 //				    //
