@@ -2,33 +2,20 @@ package zmath
 
 import "math"
 
-//								//
-// - - - TYPE DEFINITIONS - - - //
-//								//
+// Zero Vector
+var (
+	ZV  = Vec{0, 0}
+	ZVI = VecInt{0, 0}
+)
+
+//				   //
+// - - - VEC - - - //
+//				   //
 
 // Vec is a vector. Nuff said.
 type Vec struct {
 	X, Y float64
 }
-
-// VecInt is an integer vector.
-type VecInt struct {
-	X, Y int
-}
-
-// Box is a 4-cornered box of float64 vertices.
-type Box struct {
-	MinX, MinY, MaxX, MaxY float64
-}
-
-// BoxInt is a 4-cornered box of integer vertices.
-type BoxInt struct {
-	MinX, MinY, MaxX, MaxY int
-}
-
-//								  //
-// - - - 'NEW___' FUNCTIONS - - - //
-//								  //
 
 // NewVec does what you think it does
 func NewVec(x, y float64) Vec {
@@ -39,47 +26,8 @@ func NewVec(x, y float64) Vec {
 	return v
 }
 
-// NewVecInt does what you think it does
-func NewVecInt(x, y int) VecInt {
-	var vi VecInt = VecInt{
-		X: x,
-		Y: y,
-	}
-	return vi
-}
-
-var (
-	// V returns a new Vec
-	V = NewVec
-	// VI returns a new VecInt
-	VI = NewVecInt
-)
-
-// NewBox does what you think it does
-func NewBox(minX, minY, maxX, maxY float64) Box {
-	var b Box = Box{
-		MinX: minX,
-		MinY: minY,
-		MaxX: maxX,
-		MaxY: maxY,
-	}
-	return b
-}
-
-// NewBoxInt does what you think it does
-func NewBoxInt(minX, minY, maxX, maxY int) BoxInt {
-	var bi BoxInt = BoxInt{
-		MinX: minX,
-		MinY: minY,
-		MaxX: maxX,
-		MaxY: maxY,
-	}
-	return bi
-}
-
-//							    //
-// - - - MEMBER FUNCTIONS - - - //
-//							    //
+// V returns a new Vector
+var V = NewVec
 
 // Dot returns the dot product of two vectors
 func (v Vec) Dot(by Vec) float64 {
@@ -91,22 +39,6 @@ func (v Vec) Add(addend Vec) Vec {
 	return Vec{
 		X: v.X + addend.X,
 		Y: v.Y + addend.Y,
-	}
-}
-
-// Add adds
-func (vi VecInt) Add(addend VecInt) VecInt {
-	return VecInt{
-		X: vi.X + addend.X,
-		Y: vi.Y + addend.Y,
-	}
-}
-
-// AddXY adds
-func (vi VecInt) AddXY(x, y int) VecInt {
-	return VecInt{
-		X: vi.X + x,
-		Y: vi.Y + y,
 	}
 }
 
@@ -134,12 +66,194 @@ func (v Vec) ToInt() VecInt {
 	}
 }
 
+// VI converts a Vec to a VecInt
+func (v Vec) VI() VecInt {
+	return v.ToInt()
+}
+
+//				      //
+// - - - VECINT - - - //
+//				      //
+
+// VecInt is an integer vector.
+type VecInt struct {
+	X, Y int
+}
+
+// NewVecInt does what you think it does
+func NewVecInt(x, y int) VecInt {
+	var vi VecInt = VecInt{
+		X: x,
+		Y: y,
+	}
+	return vi
+}
+
+// VI returns a new VecInt
+var VI = NewVecInt
+
 // ToFloat64 converts a VecInt to a Vec
 func (vi VecInt) ToFloat64() Vec {
 	return Vec{
 		X: float64(vi.X),
 		Y: float64(vi.Y),
 	}
+}
+
+// V converts a VecInt to a Vec
+func (vi VecInt) V() Vec {
+	return vi.ToFloat64()
+}
+
+// Add adds
+func (vi VecInt) Add(addend VecInt) VecInt {
+	return VecInt{
+		X: vi.X + addend.X,
+		Y: vi.Y + addend.Y,
+	}
+}
+
+// AddXY adds
+func (vi VecInt) AddXY(x, y int) VecInt {
+	return VecInt{
+		X: vi.X + x,
+		Y: vi.Y + y,
+	}
+}
+
+// Min returns the minimum of a VecInt's two components
+func (vi VecInt) Min() int {
+	return MinInt(vi.X, vi.Y)
+}
+
+// Max returns the maximum of a VecInt's two components
+func (vi VecInt) Max() int {
+	return MaxInt(vi.X, vi.Y)
+}
+
+//				    //
+// - - - RECT - - - //
+//				    //
+
+// Rect is a good old rectangle with integer vertices.
+// Note that member functions WILL reference and modify the called Rect diRectly.
+type Rect struct {
+	Min, Max VecInt
+}
+
+// NewRect returns a new Rect. *ANY* two coordinates can be passed in in ANY order, and a correctly organized
+// Rect will still be returned.
+func NewRect(min, max VecInt) Rect {
+	return Rect{
+		Min: VI(MinInt(min.X, max.X), MinInt(min.Y, max.Y)),
+		Max: VI(MaxInt(min.X, max.X), MaxInt(min.Y, max.Y)),
+	}
+}
+
+// R returns a new Rect
+var R = NewRect
+
+// Dx returns the X width of a Rect
+func (r *Rect) Dx() int { return r.Max.X - r.Min.X }
+
+// Dy retursn the Y width of a Rect
+func (r *Rect) Dy() int { return r.Max.Y - r.Min.Y }
+
+// Diag returns the length of the diagonal of the Rect
+func (r *Rect) Diag() float64 {
+	return DistanceFormulaInt(r.Min, r.Max)
+}
+
+// Area returns the Rect's surface area
+func (r *Rect) Area() float64 {
+	return float64(r.Dx() * r.Dy())
+}
+
+// Contains returns whether the called Rectangle contains the passed point. It is min-inclusive and max-exclusive,
+// so a Rect from (0, 0) to (1, 2) ONLY contains the points (0, 0) and (0, 1). A rect where min == max will contain
+// no points and always return false.
+func (r *Rect) Contains(point VecInt) bool {
+	return point.X < r.Max.X && point.X >= r.Min.X && point.Y < r.Max.Y && point.Y >= r.Min.Y
+}
+
+// Overlaps returns whether the called rect and the passed rect overlap at all in 2D space
+func (r *Rect) Overlaps(w Rect) bool {
+	return !(r.Min.X >= w.Max.X || r.Max.X <= w.Min.X || r.Min.Y >= w.Max.Y || r.Max.Y <= w.Min.Y)
+}
+
+// Expand will expand the called rectangle by the desired amount. If either value in the argument is negative, the
+// map will still be expanded, but out from it minimum coordinate(s).
+func (r *Rect) Expand(by VecInt) *Rect {
+	if by.X > 0 {
+		r.Max.X += by.X
+	} else {
+		r.Min.X += by.X
+	}
+	if by.Y > 0 {
+		r.Max.Y += by.Y
+	} else {
+		r.Min.Y += by.Y
+	}
+	return r
+}
+
+// Shrink will shrink the called rectangle by the desired amount. If either value in the argument is negative, the
+// map will still be shrunk, but in from it minimum coordinate(s). It is not possible to make a Rect's Min exceed
+// its Max or its Max be less than its Min using this function, but it may be shrunk such that Min == Max.
+func (r *Rect) Shrink(by VecInt) *Rect {
+	if by.X > 0 {
+		r.Max.X = MaxInt(r.Min.X, r.Max.X-by.X)
+	} else {
+		r.Min.X = MinInt(r.Max.X, r.Min.X-by.X)
+	}
+	if by.Y > 0 {
+		r.Max.Y = MaxInt(r.Min.Y, r.Max.Y-by.Y)
+	} else {
+		r.Min.Y = MinInt(r.Max.Y, r.Min.Y-by.Y)
+	}
+	return r
+}
+
+// Move shifts a Rect by the desired amount
+func (r *Rect) Move(by VecInt) {
+	r.Min = r.Min.Add(by)
+	r.Max = r.Max.Add(by)
+}
+
+//				     //
+// - - - BOXES - - - //
+//				     //
+
+// Box is a 4-cornered box of float64 vertices. [OUTDATED AND BAD; USE RECT INSTEAD]
+type Box struct {
+	MinX, MinY, MaxX, MaxY float64
+}
+
+// BoxInt is a 4-cornered box of integer vertices. [OUTDATED AND BAD; USE RECT INSTEAD]
+type BoxInt struct {
+	MinX, MinY, MaxX, MaxY int
+}
+
+// NewBox does what you think it does
+func NewBox(minX, minY, maxX, maxY float64) Box {
+	var b Box = Box{
+		MinX: minX,
+		MinY: minY,
+		MaxX: maxX,
+		MaxY: maxY,
+	}
+	return b
+}
+
+// NewBoxInt does what you think it does
+func NewBoxInt(minX, minY, maxX, maxY int) BoxInt {
+	var bi BoxInt = BoxInt{
+		MinX: minX,
+		MinY: minY,
+		MaxX: maxX,
+		MaxY: maxY,
+	}
+	return bi
 }
 
 // ByVec returns a Box scaled by a Vec
@@ -172,12 +286,6 @@ func (b BoxInt) Expand(by VecInt) BoxInt {
 	return b
 }
 
-// Zero Vector
-var (
-	ZV  = Vec{0, 0}
-	ZVI = VecInt{0, 0}
-)
-
 //							  //
 // - - - MATH FUNCTIONS - - - //
 //							  //
@@ -196,6 +304,14 @@ func GetBounds(pos, size Vec) BoxInt {
 // Because Go won't do it for you.
 func MinInt(a, b int) int {
 	if a < b {
+		return a
+	}
+	return b
+}
+
+// MaxInt returns the maximum of two integers a and b, as an integer.
+func MaxInt(a, b int) int {
+	if a > b {
 		return a
 	}
 	return b

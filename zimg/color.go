@@ -8,6 +8,26 @@ import (
 	"zarks/zmath"
 )
 
+// ColorType is a way to refer to each of the four colors: R, G, B, and A!
+type ColorType int
+
+// Color Constants
+const (
+	Red ColorType = iota
+	Green
+	Blue
+	Alpha
+	R = Red
+	G = Green
+	B = Blue
+	A = Alpha
+)
+
+// RGBA256 is a float64-resolution color
+type RGBA256 struct {
+	R, G, B, A float64
+}
+
 // RGBA returns a new color.RGBA with A set to 255 (opaque)
 func RGBA(r, g, b uint8) color.RGBA {
 	return color.RGBA{
@@ -16,6 +36,26 @@ func RGBA(r, g, b uint8) color.RGBA {
 		B: b,
 		A: 255,
 	}
+}
+
+func make32bit(c color.Color) color.RGBA {
+	r, g, b, a := c.RGBA()
+	return color.RGBA{
+		R: uint8(r << 8),
+		G: uint8(g << 8),
+		B: uint8(b << 8),
+		A: uint8(a << 8),
+	}
+}
+
+func toUint8(c color.Color) [4]uint8 {
+	col32 := make32bit(c)
+	return [4]uint8{col32.R, col32.G, col32.B, col32.A}
+}
+
+// BrightnessOf returns the unweighted brightness of a color. It does not take Alpha into account.
+func BrightnessOf(c color.RGBA) float64 {
+	return (float64(c.R) + float64(c.G) + float64(c.B)) / 765.0
 }
 
 // DistanceToColor returns the euclidean "distance" between two colors. It does NOT take alpha into account!
@@ -46,10 +86,8 @@ func ImageToRGBA(img image.Image) *image.RGBA {
 	return imgRGBA
 }
 
-var (
-	// RGBAFromImage is equivalent to ImageToRGBA
-	RGBAFromImage = ImageToRGBA
-)
+// RGBAFromImage is equivalent to ImageToRGBA
+var RGBAFromImage = ImageToRGBA
 
 // Colorify returns an image colored according to the provided Map and ColorScheme
 func Colorify(noiseMap zmath.Map, scheme ColorScheme) *image.RGBA {
@@ -71,6 +109,10 @@ func MapToImage(noiseMap zmath.Map) *image.RGBA {
 
 // ImageFromMap is identical to MapToImage
 var ImageFromMap = MapToImage
+
+//                           //
+// - - - COLOR SCHEMES - - - //
+//                           //
 
 // ColorScheme represents all preset coloring functions
 type ColorScheme func(float64) color.RGBA
@@ -192,7 +234,7 @@ func CustomSmoothScheme(colors ColorSetSmooth, thresholds ThresholdSetSmooth) Co
 				)
 			}
 		}
-		fmt.Println(value)
+		fmt.Println("Error in CustomSmoothScheme for value:", value)
 		return color.RGBA{}
 	}
 

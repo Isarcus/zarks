@@ -25,6 +25,35 @@ func NewMap(bounds VecInt, initValue float64) Map {
 	return data
 }
 
+// At returns the value of the map at the coordinates specified by the passed VecInt. It does NOT bounds-check!
+func (m Map) At(pos VecInt) float64 {
+	return m[pos.X][pos.Y]
+}
+
+// Set sets the point in the map at the desired coordinates to the passed value
+func (m Map) Set(pos VecInt, value float64) {
+	m[pos.X][pos.Y] = value
+}
+
+// PtrTo returns a pointer to the map index at the desired coordinates
+func (m Map) PtrTo(pos VecInt) *float64 {
+	return &(m[pos.X][pos.Y])
+}
+
+// Bounds returns the bounds of a map
+func (m Map) Bounds() VecInt {
+	return VecInt{
+		X: len(m),
+		Y: len(m[0]),
+	}
+}
+
+// Area returns the area of the map as determined by its width and height.
+func (m Map) Area() float64 {
+	b := m.Bounds()
+	return float64(b.X * b.Y)
+}
+
 // Clear sets all points on the map equal to the passed value
 func (m Map) Clear(value float64) Map {
 	for x, row := range m {
@@ -111,6 +140,20 @@ func (m Map) Subtract(subtrahend float64) Map {
 	return m
 }
 
+// ScaleDim scales a map's dimensions by an amount. For example, scaling by 2 will double an image's dimensions.
+// This will lose data when shrinking an image
+func (m Map) ScaleDim(by float64) Map {
+	newBounds := m.Bounds().V().Scale(by).VI()
+	newMap := NewMap(newBounds, 0)
+	inv := 1.0 / by
+	for x, row := range newMap {
+		for y := range row {
+			newMap[x][y] = m.At(VI(x, y).V().Scale(inv).VI())
+		}
+	}
+	return newMap
+}
+
 // Multiply every data point by the passed value
 func (m Map) Multiply(multiplicand float64) Map {
 	for x, row := range m {
@@ -171,7 +214,7 @@ func (m Map) Interpolate(newMin, newMax float64) Map {
 	return m
 }
 
-// FlipVertical flips the map vertically.
+// FlipVertical flips the map across its X-axis..
 func (m Map) FlipVertical() Map {
 	for x, row := range m {
 		maxY := m.Bounds().Y - 1
@@ -186,7 +229,7 @@ func (m Map) FlipVertical() Map {
 	return m
 }
 
-// FlipHorizontal flips the map horizontally.
+// FlipHorizontal flips the map across its Y-axis.
 func (m Map) FlipHorizontal() Map {
 	maxX := m.Bounds().X - 1
 	for x, row := range m {
@@ -298,7 +341,7 @@ func (m Map) CustomModAt(points []VecInt, modFunc func(float64) float64) Map {
 	return m
 }
 
-// Copy returns a copy of the portion of the map specified by the min and max coordinates.
+// Copy returns a deepcopy of the portion of the map specified by the min and max coordinates.
 // If min > max, a map with zero bounds in either direction will be returned.
 // If min or max exceed the bounds of the called map, any out-of-bounds coordinates will be set to zero.
 // To copy the entire map, use `m.Copy(zmath.ZVI, m.Bounds())`.
@@ -325,6 +368,12 @@ func (m Map) Copy(min, max VecInt) Map {
 	}
 
 	return copyMap
+}
+
+// CopyAll deepcopies an entire map and returns the copy.
+// Equivalent to calling the Copy() function for a map's entire area.
+func (m Map) CopyAll() Map {
+	return m.Copy(ZVI, m.Bounds())
 }
 
 // Paste pastes all of the data from pasteMe into a map, starting at the specified coordinate in the called map.
@@ -391,29 +440,6 @@ func (m Map) ToLinear() Set {
 		linear = append(linear, m[i]...)
 	}
 	return linear
-}
-
-// At returns the value of the map at the coordinates specified by the passed VecInt. It does NOT bounds-check!
-func (m Map) At(pos VecInt) float64 {
-	return m[pos.X][pos.Y]
-}
-
-// Set sets the point in the map at the desired coordinates to the passed value
-func (m Map) Set(pos VecInt, value float64) {
-	m[pos.X][pos.Y] = value
-}
-
-// PtrTo returns a pointer to the map index at the desired coordinates
-func (m Map) PtrTo(pos VecInt) *float64 {
-	return &(m[pos.X][pos.Y])
-}
-
-// Bounds returns the bounds of a map
-func (m Map) Bounds() VecInt {
-	return VecInt{
-		X: len(m),
-		Y: len(m[0]),
-	}
 }
 
 // ContainsCoord tells you whether the specified coordinate is inside the called map
@@ -553,7 +579,7 @@ func MapFromImage(img *image.RGBA, color Color) Map {
 	return imgMap
 }
 
-// ImageToMap is identical to MapFromImage
+// ImageToMap returns a map of the R, G, B, or brightness values of an image
 var ImageToMap = MapFromImage
 
 // Save saves a Map as binary data at the path specified. File ending should be .zmap

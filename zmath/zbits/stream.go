@@ -39,7 +39,7 @@ func (s *Stream) Paste(startingAt int, pasteMe []byte) {
 	}
 }
 
-// GetData returns a slice of the called Stream's data
+// GetData returns a slice of all of the called Stream's data
 func (s *Stream) GetData() []byte {
 	return s.data
 }
