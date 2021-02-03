@@ -30,7 +30,7 @@ func WriteBytes(f *os.File, bytes []byte) {
 	written := 0
 	tries := 0
 	for written < len(bytes) && tries < 2 {
-		l, err := f.Write(bytes[written:len(bytes)])
+		l, err := f.Write(bytes[written:])
 		written += l
 		if err != nil {
 			fmt.Println("Error writing in try #", tries, ": ", err)

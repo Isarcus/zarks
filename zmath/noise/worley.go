@@ -4,7 +4,7 @@ import (
 	"zarks/zmath"
 )
 
-// NewWorleyMap returns a new Worley Noise map
+// NewWorleyMap returns a new Worley Noise map (TODO)
 func NewWorleyMap(cfg Config) zmath.Map {
 	cfg.checkDefaults()
 	noiseMap := zmath.NewMap(cfg.Dimensions, 0)

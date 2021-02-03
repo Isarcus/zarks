@@ -76,11 +76,11 @@ func getTitle(t saveType, r *bufio.Reader) string {
 
 func getConfig(r *bufio.Reader) noise.Config {
 	var (
-		done    = false
-		bounds  zmath.VecInt
-		octaves int
-		rad     float64
-		bsi     float64
+		done   = false
+		bounds zmath.VecInt
+		oct    int
+		rad    float64
+		bsi    float64
 	)
 
 	// Dimensions
@@ -101,7 +101,7 @@ func getConfig(r *bufio.Reader) noise.Config {
 			fmt.Println(err)
 		} else {
 			done = true
-			octaves = zmath.MaxInt(1, val)
+			oct = zmath.MaxInt(1, val)
 		}
 	}
 
@@ -137,7 +137,7 @@ func getConfig(r *bufio.Reader) noise.Config {
 	return noise.Config{
 		Dimensions:     bounds,
 		Normalize:      true,
-		Octaves:        octaves,
+		Octaves:        oct,
 		R:              rad,
 		BoxSizeInitial: bsi,
 	}
@@ -179,8 +179,4 @@ func c(n ...int) {
 			fmt.Println()
 		}
 	}
-}
-
-func main() {
-	RunShell()
 }

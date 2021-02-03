@@ -12,7 +12,8 @@ var (
 // - - - VEC - - - //
 //				   //
 
-// Vec is a vector. Nuff said.
+// Vec is a vector.
+// Note that Vec's member functions will NOT modify the underlying Vec when called!
 type Vec struct {
 	X, Y float64
 }
@@ -29,17 +30,17 @@ func NewVec(x, y float64) Vec {
 // V returns a new Vector
 var V = NewVec
 
-// Dot returns the dot product of two vectors
-func (v Vec) Dot(by Vec) float64 {
-	return v.X*by.X + v.Y*by.Y
-}
-
 // Add adds
 func (v Vec) Add(addend Vec) Vec {
 	return Vec{
 		X: v.X + addend.X,
 		Y: v.Y + addend.Y,
 	}
+}
+
+// AddXY adds two float64's to a Vec (x adds to X; y adds to Y)
+func (v Vec) AddXY(x, y float64) Vec {
+	return v.Add(V(x, y))
 }
 
 // Subtract subtracts
@@ -50,12 +51,43 @@ func (v Vec) Subtract(subtrahend Vec) Vec {
 	}
 }
 
-// Scale scales a vector by some value. Scale by 0 to zero the vector
+// Multiply multiplies
+func (v Vec) Multiply(multiplicand Vec) Vec {
+	return Vec{
+		X: v.X * multiplicand.X,
+		Y: v.Y * multiplicand.Y,
+	}
+}
+
+// Divide divides. No divide-by-zero-checking included; you gotta do that yourself!
+func (v Vec) Divide(divisor Vec) Vec {
+	return Vec{
+		X: v.X / divisor.X,
+		Y: v.Y / divisor.Y,
+	}
+}
+
+// Scale scales a Vec by some vlaue.
 func (v Vec) Scale(by float64) Vec {
 	return Vec{
 		X: v.X * by,
 		Y: v.Y * by,
 	}
+}
+
+// Min returns the minimum of a Vec's two components
+func (v Vec) Min() float64 {
+	return math.Min(v.X, v.Y)
+}
+
+// Max returns the maximum of a Vec's two components
+func (v Vec) Max() float64 {
+	return math.Max(v.X, v.Y)
+}
+
+// Dot returns the dot product of two vectors
+func (v Vec) Dot(by Vec) float64 {
+	return v.X*by.X + v.Y*by.Y
 }
 
 // ToInt converts a Vec to a VecInt
@@ -76,6 +108,7 @@ func (v Vec) VI() VecInt {
 //				      //
 
 // VecInt is an integer vector.
+// Note that VecInt's member functions will NOT modify the underlying VecInt when called!
 type VecInt struct {
 	X, Y int
 }
@@ -113,12 +146,38 @@ func (vi VecInt) Add(addend VecInt) VecInt {
 	}
 }
 
-// AddXY adds
+// AddXY adds two integers to a VecInt (x adds to X; y adds to Y)
 func (vi VecInt) AddXY(x, y int) VecInt {
+	return vi.Add(VI(x, y))
+}
+
+// Subtract subtracts
+func (vi VecInt) Subtract(subtrahend VecInt) VecInt {
 	return VecInt{
-		X: vi.X + x,
-		Y: vi.Y + y,
+		X: vi.X - subtrahend.X,
+		Y: vi.Y - subtrahend.Y,
 	}
+}
+
+// Multiply multiplies
+func (vi VecInt) Multiply(multiplicand VecInt) VecInt {
+	return VecInt{
+		X: vi.X * multiplicand.X,
+		Y: vi.Y * multiplicand.Y,
+	}
+}
+
+// Divide divides. No divide-by-zero-checking included; you gotta do that yourself!
+func (vi VecInt) Divide(divisor VecInt) VecInt {
+	return VecInt{
+		X: vi.X / divisor.X,
+		Y: vi.Y / divisor.Y,
+	}
+}
+
+// Scale scales a VecInt by some value.
+func (vi VecInt) Scale(by float64) VecInt {
+	return vi.V().Scale(by).VI()
 }
 
 // Min returns the minimum of a VecInt's two components

@@ -13,10 +13,10 @@ func NewPerlinMap(cfg Config) zmath.Map {
 	perlinMap := zmath.NewMap(cfg.Dimensions, 0)
 
 	var cornerVecs = [4]zmath.Vec{
-		zmath.NewVec(0, 0),
-		zmath.NewVec(1, 0),
-		zmath.NewVec(1, 1),
-		zmath.NewVec(0, 1),
+		zmath.V(0, 0),
+		zmath.V(1, 0),
+		zmath.V(1, 1),
+		zmath.V(0, 1),
 	}
 
 	// The Loop
@@ -24,7 +24,7 @@ func NewPerlinMap(cfg Config) zmath.Map {
 		boxSize := cfg.BoxSizeInitial / math.Pow(2, oct)
 		boxesX := math.Ceil(float64(cfg.Dimensions.X)/boxSize) + 1
 		boxesY := math.Ceil(float64(cfg.Dimensions.Y)/boxSize) + 1
-		vectors := zmath.NewMapVec(zmath.NewVecInt(int(boxesX+1), int(boxesY+1)))
+		vectors := zmath.NewMapVec(zmath.VI(int(boxesX+1), int(boxesY+1)))
 
 		for bx := 0; bx < int(boxesX); bx++ {
 			for by := 0; by < int(boxesY); by++ {
@@ -87,9 +87,7 @@ func NewPerlinMap(cfg Config) zmath.Map {
 
 	// Post-analysis
 	if cfg.Normalize {
-		linearMap := zmath.ToLinear(perlinMap)
-		linearMap.Interpolate(0, 1)
-		linearMap.To2D(perlinMap)
+		perlinMap.Interpolate(0, 1)
 	}
 
 	return perlinMap

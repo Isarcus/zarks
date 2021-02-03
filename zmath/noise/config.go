@@ -22,10 +22,10 @@ type Config struct {
 
 // DefaultConfig will give you a randomly seeded, 512x512 image with 4 octaves.
 var DefaultConfig = Config{
-	Dimensions:     zmath.NewVecInt(512, 512),
+	Dimensions:     zmath.VI(512, 512),
 	Octaves:        4,
 	Seed:           0,
-	BoxSizeInitial: 128,
+	BoxSizeInitial: 256,
 	Normalize:      true,
 
 	R: 0.6,

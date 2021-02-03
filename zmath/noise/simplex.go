@@ -28,7 +28,7 @@ func NewSimplexMap(cfg Config) zmath.Map {
 		// dive in
 		for x := 0; x < cfg.Dimensions.X; x++ {
 			for y := 0; y < cfg.Dimensions.Y; y++ {
-				ipt := zmath.NewVec(
+				ipt := zmath.V(
 					float64(x)/(cfg.BoxSizeInitial*octInfluence),
 					float64(y)/(cfg.BoxSizeInitial*octInfluence),
 				)
@@ -39,23 +39,23 @@ func NewSimplexMap(cfg Config) zmath.Map {
 				// find internal coordinates of simplex
 				var corners [3]zmath.Vec
 				var vectors [3]zmath.Vec
-				corners[0] = zmath.NewVec(math.Floor(skewed.X), math.Floor(skewed.Y))
-				internal := zmath.NewVec(skewed.X-corners[0].X, skewed.Y-corners[0].Y)
+				corners[0] = zmath.V(math.Floor(skewed.X), math.Floor(skewed.Y))
+				internal := zmath.V(skewed.X-corners[0].X, skewed.Y-corners[0].Y)
 				if internal.X > internal.Y {
-					corners[1] = corners[0].Add(zmath.NewVec(1, 0))
+					corners[1] = corners[0].Add(zmath.V(1, 0))
 				} else {
-					corners[1] = corners[0].Add(zmath.NewVec(0, 1))
+					corners[1] = corners[0].Add(zmath.V(0, 1))
 				}
-				corners[2] = corners[0].Add(zmath.NewVec(1, 1))
+				corners[2] = corners[0].Add(zmath.V(1, 1))
 
 				// get vectors of the three corners
 				for i := 0; i < 3; i++ {
 					key := getKey(corners[i].ToInt())
 					if angle, ok := vecMap[key]; ok { // if random angle already determined, use it
-						vectors[i] = zmath.NewVec(math.Cos(angle), math.Sin(angle))
+						vectors[i] = zmath.V(math.Cos(angle), math.Sin(angle))
 					} else { // otherwise, generate one for this and future use
 						angle = rand.Float64() * 2.0 * math.Pi
-						vectors[i] = zmath.NewVec(math.Cos(angle), math.Sin(angle))
+						vectors[i] = zmath.V(math.Cos(angle), math.Sin(angle))
 						vecMap[key] = angle
 					}
 				}
@@ -81,9 +81,7 @@ func NewSimplexMap(cfg Config) zmath.Map {
 	}
 
 	if cfg.Normalize {
-		linearData := zmath.ToLinear(simplexMap)
-		linearData.Interpolate(0, 1)
-		linearData.To2D(simplexMap)
+		simplexMap.Interpolate(0, 1)
 	}
 
 	return simplexMap
