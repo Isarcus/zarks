@@ -381,10 +381,21 @@ func MinIntList(numbers ...int) int {
 	min := numbers[0]
 
 	for i := 1; i < len(numbers); i++ {
-		MinInt(min, numbers[i])
+		min = MinInt(min, numbers[i])
 	}
 
 	return min
+}
+
+// MaxIntList returns the maximum of an arbitrarily long list of integers
+func MaxIntList(numbers ...int) int {
+	max := numbers[0]
+
+	for i := 1; i < len(numbers); i++ {
+		max = MaxInt(max, numbers[i])
+	}
+
+	return max
 }
 
 // IsWithinBounds checks whether the provited vector is within the provided BoxInt

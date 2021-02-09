@@ -376,4 +376,14 @@ var (
 	ThresholdSetMiddle = ThresholdSetSmooth{
 		0.5,
 	}
+
+	// Red, White, and Green
+	ColorSetChristmas = ColorSetSmooth{
+		RGBA(200, 0, 0),
+		RGBA(245, 245, 245),
+		RGBA(20, 200, 20),
+	}
+	ThresholdSetChristmas = ThresholdSetSmooth{
+		0.5,
+	}
 )

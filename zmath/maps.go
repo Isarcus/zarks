@@ -522,6 +522,12 @@ func (m Map) DerivativeAt(pos VecInt) Vec {
 	return dh
 }
 
+// GradientAt returns the angle of the gradient at the desired coordinate using Atan2
+func (m Map) GradientAt(pos VecInt) float64 {
+	d := m.DerivativeAt(pos)
+	return math.Atan2(d.Y, d.X)
+}
+
 // SlopeAt returns the slope at the point
 func (m Map) SlopeAt(pos VecInt) float64 {
 	dh := m.DerivativeAt(pos)

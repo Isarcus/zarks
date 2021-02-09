@@ -154,6 +154,12 @@ func (zi *ZImage) Zero() *ZImage {
 	return zi
 }
 
+// MakeOpaque sets the underlying Alpha map to 255
+func (zi *ZImage) MakeOpaque() *ZImage {
+	zi.RGBA256[Alpha].Clear(255)
+	return zi
+}
+
 // BlurGaussian blurs gaussianly! (and very slowly, unfortunately)
 func (zi *ZImage) BlurGaussian(radius int) *ZImage {
 	for _, m := range zi.RGBA256 {
