@@ -10,20 +10,20 @@ type Set []float64
 
 // ToLinear copies by value a [][]float64 to []float64. Any Changes made to the returned Set can then
 // be committed to the [][]float64 with the To2D function.
-func ToLinear(some2DData [][]float64) Set {
-	linearData := make(Set, 0)
-	for i := range some2DData {
-		linearData = append(linearData, some2DData[i]...)
+func ToLinear(data Map) Set {
+	linearData := make(Set, 0, int(data.Area()))
+	for i := range data {
+		linearData = append(linearData, data[i]...)
 	}
 	return linearData
 }
 
 // To2D copies by value a []float64 into a pre-existing [][]float64
-func (data Set) To2D(to [][]float64) [][]float64 {
+func (s Set) To2D(to [][]float64) [][]float64 {
 	idx := 0
 	for i := 0; i < len(to); i++ {
 		for j := 0; j < len(to[i]); j++ {
-			to[i][j] = data[idx]
+			to[i][j] = s[idx]
 			idx++
 		}
 	}
@@ -31,15 +31,15 @@ func (data Set) To2D(to [][]float64) [][]float64 {
 }
 
 // IndicesBetween returns the number of indices between the two values provided. Assumes the Set is pre-sorted.
-func (data Set) IndicesBetween(min, max float64) int {
-	idxMin := data.IndexOfClosest(min)
-	idxMax := data.IndexOfClosest(max)
+func (s Set) IndicesBetween(min, max float64) int {
+	idxMin := s.IndexOfClosest(min)
+	idxMax := s.IndexOfClosest(max)
 	return idxMax - idxMin
 }
 
-// IndexOf returns the index of the desired item in the Set, or -1 if not found
-func (data Set) IndexOf(value float64) int {
-	for i, item := range data {
+// IndexOf returns the lowest index of the desired item in the Set, or -1 if not found
+func (s Set) IndexOf(value float64) int {
+	for i, item := range s {
 		if item == value {
 			return i
 		}
@@ -48,19 +48,19 @@ func (data Set) IndexOf(value float64) int {
 }
 
 // IndexOfClosest returns the index of the item closest to the desired value. Assumes the Set is pre-sorted.
-func (data Set) IndexOfClosest(value float64) int {
-	idx := data.IndexOf(value)
+func (s Set) IndexOfClosest(value float64) int {
+	idx := s.IndexOf(value)
 	if idx != -1 { // if data contains the exact value (yay)
 		return idx
 	}
 
-	if value < data.GetMin() {
+	if value < s.GetMin() {
 		return 0
-	} else if value > data.GetMax() {
-		return len(data) - 1
+	} else if value > s.GetMax() {
+		return len(s) - 1
 	}
 
-	for i, item := range data {
+	for i, item := range s {
 		if item > value {
 			return i
 		}
@@ -69,9 +69,9 @@ func (data Set) IndexOfClosest(value float64) int {
 }
 
 // GetMin returns the min of a Set
-func (data Set) GetMin() float64 {
-	min := data[0]
-	for _, item := range data {
+func (s Set) GetMin() float64 {
+	min := s[0]
+	for _, item := range s {
 		if min > item {
 			min = item
 		}
@@ -80,9 +80,9 @@ func (data Set) GetMin() float64 {
 }
 
 // GetMax returns the max of a Set
-func (data Set) GetMax() float64 {
-	max := data[0]
-	for _, item := range data {
+func (s Set) GetMax() float64 {
+	max := s[0]
+	for _, item := range s {
 		if max < item {
 			max = item
 		}
@@ -92,9 +92,9 @@ func (data Set) GetMax() float64 {
 
 // GetRange returns the range of a Set. This is computationally faster than GetMaxOf() - GetMinOf() if you
 // only need the range for a given task.
-func (data Set) GetRange() float64 {
-	min, max := data[0], data[0]
-	for _, item := range data {
+func (s Set) GetRange() float64 {
+	min, max := s[0], s[0]
+	for _, item := range s {
 		if min > item {
 			min = item
 		}
@@ -106,92 +106,118 @@ func (data Set) GetRange() float64 {
 }
 
 // GetMedian returns the median of a Set
-func (data Set) GetMedian() float64 {
-	dataCopy := make(Set, 0, len(data))
-	copy(dataCopy, data)
+func (s Set) GetMedian() float64 {
+	dataCopy := make(Set, 0, len(s))
+	copy(dataCopy, s)
 	dataCopy.Sort()
 	var median float64
-	idx := len(data) / 2
-	if len(data)%2 == 1 { // if len(data) is odd
-		median = data[idx]
+	idx := len(s) / 2
+	if len(s)%2 == 1 { // if len(data) is odd
+		median = s[idx]
 	} else {
-		median = (data[idx] + data[idx-1]) / 2.0
+		median = (s[idx] + s[idx-1]) / 2.0
 	}
 	return median
 }
 
 // GetMean returns the mean of a Set
-func (data Set) GetMean() float64 {
+func (s Set) GetMean() float64 {
 	var sum float64
-	for _, item := range data {
+	for _, item := range s {
 		sum += item
 	}
-	return sum / float64(len(data))
+	return sum / float64(len(s))
 }
 
 // GetVariance returns the variance of a Set
-func (data Set) GetVariance() float64 {
+func (s Set) GetVariance() float64 {
 	var squareSum float64
-	mean := data.GetMean()
-	for _, item := range data {
+	mean := s.GetMean()
+	for _, item := range s {
 		squareSum += math.Pow(mean-item, 2)
 	}
-	return squareSum / float64(len(data))
+	return squareSum / float64(len(s))
 }
 
 // GetStd returns the standard deviation of a Set
-func (data Set) GetStd() float64 {
-	return math.Sqrt(data.GetVariance())
-}
-
-// Interpolate linearly adjusts the data to a new min and max
-func (data Set) Interpolate(newMin, newMax float64) Set {
-	oldMin := data.GetMin()
-	oldMax := data.GetMax()
-	oldRange := oldMax - oldMin
-	newRange := newMax - newMin
-
-	for i := range data {
-		data[i] = ((data[i]-oldMin)/oldRange)*newRange + newMin
-	}
-
-	return data
+func (s Set) GetStd() float64 {
+	return math.Sqrt(s.GetVariance())
 }
 
 // Zero zeroes a Set
-func (data Set) Zero() {
-	for i := 0; i < len(data); i++ {
-		data[i] = 0
+func (s Set) Zero() Set {
+	for i := 0; i < len(s); i++ {
+		s[i] = 0
 	}
+	return s
+}
+
+// Copy deepcopies the called Set into a new Set and returns the new one
+func (s Set) Copy() Set {
+	newSet := make(Set, len(s))
+	copy(newSet, s)
+	return newSet
+}
+
+// Interpolate linearly adjusts the data to a new min and max
+func (s Set) Interpolate(newMin, newMax float64) Set {
+	oldMin := s.GetMin()
+	oldMax := s.GetMax()
+	oldRange := oldMax - oldMin
+	newRange := newMax - newMin
+
+	for i := range s {
+		s[i] = ((s[i]-oldMin)/oldRange)*newRange + newMin
+	}
+
+	return s
+}
+
+// MakeUniform makes the called Set follow a uniform distribution
+func (s Set) MakeUniform() Set {
+	var (
+		length = float64(len(s)) - 1
+		sorted = s.Copy().Sort()
+		retSet = make(Set, len(s))
+	)
+
+	for i, val := range s {
+		retSet[i] = float64(sorted.IndexOf(val)) / length
+	}
+
+	copy(s, retSet)
+	return s
 }
 
 // Sort sorts a Set with a quicksort implementation
-func (data Set) Sort() { // this is copied code but it works beautifully
-	if len(data) < 2 {
-		return
+func (s Set) Sort() Set { // this is copied code but it works beautifully
+	if len(s) < 2 {
+		return s
 	}
 
-	left, right := 0, len(data)-1
-	pivotIndex := len(data) / 2
+	left, right := 0, len(s)-1
+	pivotIndex := len(s) / 2
 
-	data[pivotIndex], data[right] = data[right], data[pivotIndex]
+	s[pivotIndex], s[right] = s[right], s[pivotIndex]
 
-	for i := range data {
-		if data[i] < data[right] {
-			data[i], data[left] = data[left], data[i]
+	for i := range s {
+		if s[i] < s[right] {
+			s[i], s[left] = s[left], s[i]
 			left++
 		}
 	}
 
-	data[left], data[right] = data[right], data[left]
+	s[left], s[right] = s[right], s[left]
 
 	// Recursively call function
-	Set(data[:left]).Sort()
-	Set(data[left+1:]).Sort()
+	Set(s[:left]).Sort()
+	Set(s[left+1:]).Sort()
+
+	return s
 }
 
-// Analysis contains basic statistical analysis about a Set
-type Analysis struct {
+// Stats contains basic statistical analysis about a Set
+type Stats struct {
 	Size, _  int
 	Min      float64
 	Max      float64
@@ -202,24 +228,24 @@ type Analysis struct {
 	Std      float64
 }
 
-// GetAnalysisOf returns an Analysis struct according to the contents of the Set
-func GetAnalysisOf(data Set) *Analysis {
-	min, max := data.GetMin(), data.GetMax()
-	variance := data.GetVariance()
-	return &Analysis{
-		Size:     len(data),
+// GetAnalysis returns an Analysis struct according to the contents of the Set
+func (s Set) GetAnalysis() *Stats {
+	min, max := s.GetMin(), s.GetMax()
+	variance := s.GetVariance()
+	return &Stats{
+		Size:     len(s),
 		Min:      min,
 		Max:      max,
 		Range:    max - min,
-		Median:   data.GetMedian(),
-		Mean:     data.GetMean(),
+		Median:   s.GetMedian(),
+		Mean:     s.GetMean(),
 		Variance: variance,
 		Std:      math.Sqrt(variance),
 	}
 }
 
 // PrintAnalysis outputs the analysis to the terminal
-func PrintAnalysis(a *Analysis) {
+func PrintAnalysis(a *Stats) {
 	fmt.Println("N:        ", a.Size)
 	fmt.Println("Min:      ", a.Min)
 	fmt.Println("Max:      ", a.Max)
@@ -232,13 +258,13 @@ func PrintAnalysis(a *Analysis) {
 
 // PrintBasicHistogram prints out what percentages of the dataset are within certain histogram ranges.
 // Use on a noise map (simplex, perlin, etc.) for some interesting insights!
-func (data Set) PrintBasicHistogram() {
-	sorted := make(Set, len(data))
-	copy(sorted, data)
+func (s Set) PrintBasicHistogram() {
+	sorted := make(Set, len(s))
+	copy(sorted, s)
 	sorted.Sort()
 
-	std := data.GetStd()
-	mean := data.GetMean()
+	std := s.GetStd()
+	mean := s.GetMean()
 
 	for s := -3.; s < 3; s++ {
 		min, max := mean+s*std, mean+(s+1)*std

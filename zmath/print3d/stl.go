@@ -191,8 +191,8 @@ func MapToSTLData(data zmath.Map, title string, makeSolid bool) *STLData {
 	}
 }
 
-// WriteSTLToBinary creates an STL file from an STLData struct.
-func WriteSTLToBinary(data *STLData, path string) {
+// Save creates an STL file from an STLData struct.
+func (data *STLData) Save(path string) {
 	f := system.CreateFile(path)
 	defer f.Close()
 

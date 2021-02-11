@@ -1,9 +1,11 @@
 package zmath
 
 import (
+	"encoding/binary"
 	"fmt"
 	"image"
 	"math"
+	"os"
 	"zarks/system"
 	"zarks/zmath/zbits"
 )
@@ -120,6 +122,27 @@ func (m Map) GetMax() float64 {
 	return 0
 }
 
+// GetMinMax returns the min and max of the called Map.
+// This is computationally faster than calling GetMin and GetMax independently.
+func (m Map) GetMinMax() (min, max float64) {
+	if m.Bounds().X > 0 && m.Bounds().Y > 0 {
+		min, max = m[0][0], m[0][0]
+		for _, row := range m {
+			for _, val := range row {
+				min = math.Min(min, val)
+				max = math.Max(max, val)
+			}
+		}
+	}
+	return
+}
+
+// GetRange returns the range of the called Map.
+func (m Map) GetRange() float64 {
+	min, max := m.GetMinMax()
+	return max - min
+}
+
 // Add the passed value to every datapoint
 func (m Map) Add(addend float64) Map {
 	for x, row := range m {
@@ -211,6 +234,18 @@ func (m Map) Interpolate(newMin, newMax float64) Map {
 	linear := m.ToLinear()
 	linear.Interpolate(newMin, newMax)
 	linear.To2D(m)
+	return m
+}
+
+// MakeUniform makes the called Map follow a uniform distribution.
+// This will not change the original min and max values of the called map.
+func (m Map) MakeUniform() Map {
+	min, max := m.GetMinMax()
+	linear := m.ToLinear()
+	linear.MakeUniform()
+	linear.To2D(m)
+	m.Interpolate(min, max)
+
 	return m
 }
 
@@ -597,10 +632,6 @@ func (m Map) Save(path string) {
 	header := [64]byte{}
 	system.WriteBytes(f, header[:])
 
-	// Settings [8]
-	settings := [8]byte{}
-	system.WriteBytes(f, settings[:])
-
 	// bounds (8)
 	var dimX = uint32(m.Bounds().X)
 	var dimY = uint32(m.Bounds().Y)
@@ -614,6 +645,38 @@ func (m Map) Save(path string) {
 			system.WriteBytes(f, zbits.Uint64ToBytes(bits, zbits.LittleEndian))
 		}
 	}
+}
+
+// MapFromPath loads a Map from the target path
+func MapFromPath(path string) Map {
+	f, err := os.Open(path)
+	if err != nil {
+		fmt.Println(err)
+		return Map{{}}
+	}
+
+	// Header (64)
+	hdr := [64]byte{}
+	f.Read(hdr[:])
+
+	// Bounds (8)
+	bounds := [8]byte{}
+	f.Read(bounds[:])
+
+	dimX := binary.LittleEndian.Uint32(bounds[0:4])
+	dimY := binary.LittleEndian.Uint32(bounds[4:8])
+	newMap := NewMap(VI(int(dimX), int(dimY)), 0)
+
+	// Data (8n)
+	for x, row := range newMap {
+		for y := range row {
+			bytes := [8]byte{}
+			f.Read(bytes[:])
+			newMap[x][y] = math.Float64frombits(binary.LittleEndian.Uint64(bytes[:]))
+		}
+	}
+
+	return newMap
 }
 
 //                    //
