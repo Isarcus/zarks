@@ -22,6 +22,7 @@ func GetLines(f os.File) []string {
 
 			// if the end of the file
 			if n == 0 {
+				lines = append(lines, line)
 				fileDone = true
 				break
 			}
