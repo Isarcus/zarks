@@ -32,7 +32,7 @@ func (m Map) At(pos VecInt) float64 {
 	return m[pos.X][pos.Y]
 }
 
-// Set sets the point in the map at the desired coordinates to the passed value
+// Set sets the point in the map at the desired coordinates to the passed value. It does NOT bounds-check!
 func (m Map) Set(pos VecInt, value float64) {
 	m[pos.X][pos.Y] = value
 }

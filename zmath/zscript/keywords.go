@@ -19,12 +19,12 @@ const (
 
 // Datatypes
 const (
-	INT   DataType = "Int"
-	FLOAT DataType = "Float"
-	BOOL  DataType = "Bool"
+	Int   DataType = "Int"
+	Float DataType = "Float"
+	Bool  DataType = "Bool"
 
-	SET    DataType = "Set"
-	MAP    DataType = "Map"
-	VEC    DataType = "Vec"
-	VECINT DataType = "VecInt"
+	Set    DataType = "Set"
+	Map    DataType = "Map"
+	Vec    DataType = "Vec"
+	VecInt DataType = "VecInt"
 )

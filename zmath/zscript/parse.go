@@ -2,45 +2,37 @@ package zscript
 
 import "os"
 
-// ParseFile will parse a .zs file and execute it
-func ParseFile(f os.File) {
+// Parser is a struct capable of loading and executing some zscript code
+type Parser struct {
+	lines [][]string
 
+	objects map[string]Object
+	current [][]string // the last []string of current is the list of all variables in the narrowest scope
 }
 
-// GetLines reads an os.File and returns its data as a bunch of strings broken up by lines
-func GetLines(f os.File) []string {
-	lines := make([]string, 0, 10)
-
-	for {
-		var (
-			line     string = ""
-			fileDone bool   = false
-		)
-		for {
-			b := make([]byte, 1, 1)
-			n, _ := f.Read(b)
-
-			// if the end of the file
-			if n == 0 {
-				lines = append(lines, line)
-				fileDone = true
-				break
-			}
-
-			// if the end of a line
-			if b[0] == '\n' {
-				lines = append(lines, line)
-				break
-			}
-
-			// if safe, append just-read byte to the end of the current line
-			line += string(b)
-		}
-
-		if fileDone {
-			break
-		}
+// NewParser returns a new Parser from a file, but does not execute the code it loads in
+func NewParser(f os.File) *Parser {
+	var (
+		linesRaw = GetLines(f)
+		lines    = make([][]string, len(linesRaw))
+	)
+	for i, line := range linesRaw {
+		lines[i] = GetWords(line)
 	}
 
-	return lines
+	return &Parser{
+		lines: lines,
+	}
 }
+
+// Execute runs all of the called Parser's code
+/*
+func (p *Parser) Execute() {
+	for _, line := range p.lines {
+		for i, word := range line {
+			if i == 0 {
+
+			}
+		}
+	}
+}*/

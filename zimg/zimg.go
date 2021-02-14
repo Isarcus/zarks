@@ -27,7 +27,7 @@ type ZImage struct {
 type zptr struct {
 	active bool
 	img    *ZImage
-	area   zmath.Rect
+	area   zmath.RectInt
 }
 
 // NewZImage creates returns a new, empty ZImage of the desired size
@@ -42,7 +42,7 @@ func NewZImage(bounds zmath.VecInt) *ZImage {
 	src := zptr{
 		active: false,
 		img:    nil,
-		area:   zmath.R(zmath.ZVI, bounds),
+		area:   zmath.RI(zmath.ZVI, bounds),
 	}
 	return &ZImage{
 		RGBA256: rgba,
