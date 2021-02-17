@@ -19,6 +19,8 @@ func Query(reader *bufio.Reader, question string) string {
 
 	ipt, _ := reader.ReadString('\n')
 	ipt = strings.Replace(ipt, "\r\n", "", -1) // necessary for Windows computers to format correctly
+	ipt = strings.Replace(ipt, "\r", "", -1)   // just in case
+	ipt = strings.Replace(ipt, "\n", "", -1)   // just in case
 	return ipt
 }
 

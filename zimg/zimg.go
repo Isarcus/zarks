@@ -27,7 +27,7 @@ type ZImage struct {
 type zptr struct {
 	active bool
 	img    *ZImage
-	area   zmath.RectInt
+	area   *zmath.RectInt
 }
 
 // NewZImage creates returns a new, empty ZImage of the desired size

@@ -241,8 +241,8 @@ type Rect struct {
 
 // NewRect returns a new Rect. *ANY* two coordinates can be passed in in ANY order, and a correctly organized
 // Rect will still be returned.
-func NewRect(min, max Vec) Rect {
-	return Rect{
+func NewRect(min, max Vec) *Rect {
+	return &Rect{
 		Min: V(math.Min(min.X, max.X), math.Min(min.Y, max.Y)),
 		Max: V(math.Max(min.X, max.X), math.Max(min.Y, max.Y)),
 	}
@@ -257,6 +257,20 @@ func (r *Rect) Dx() float64 { return r.Max.X - r.Min.X }
 // Dy returns the Y width of a Rect
 func (r *Rect) Dy() float64 { return r.Max.Y - r.Min.Y }
 
+// Scale scales the called Rect by the passed value, around (0, 0)
+func (r *Rect) Scale(by float64) *Rect {
+	r.Max = r.Max.Scale(by)
+	r.Min = r.Min.Scale(by)
+	return r
+}
+
+// Shift moves a Rect by the desired amount
+func (r *Rect) Shift(by Vec) *Rect {
+	r.Min = r.Min.Add(by)
+	r.Max = r.Max.Add(by)
+	return r
+}
+
 //				       //
 // - - - RECTINT - - - //
 //				       //
@@ -269,8 +283,8 @@ type RectInt struct {
 
 // NewRectInt returns a new Rect. *ANY* two coordinates can be passed in in ANY order, and a correctly organized
 // RectInt will still be returned.
-func NewRectInt(min, max VecInt) RectInt {
-	return RectInt{
+func NewRectInt(min, max VecInt) *RectInt {
+	return &RectInt{
 		Min: VI(MinInt(min.X, max.X), MinInt(min.Y, max.Y)),
 		Max: VI(MaxInt(min.X, max.X), MaxInt(min.Y, max.Y)),
 	}
@@ -340,10 +354,11 @@ func (ri *RectInt) Shrink(by VecInt) *RectInt {
 	return ri
 }
 
-// Move shifts a Rect by the desired amount
-func (ri *RectInt) Move(by VecInt) {
+// Shift moves a Rect by the desired amount
+func (ri *RectInt) Shift(by VecInt) *RectInt {
 	ri.Min = ri.Min.Add(by)
 	ri.Max = ri.Max.Add(by)
+	return ri
 }
 
 //				     //

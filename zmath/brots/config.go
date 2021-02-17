@@ -4,7 +4,7 @@ import "zarks/zmath"
 
 // Config contains all of the information necessary to generate a custom Mandelbrot map
 type Config struct {
-	Bounds zmath.Rect   // The area to be tested
+	Bounds *zmath.Rect  // The area to be tested
 	Res    zmath.VecInt // The resolution of the map
 	Iter   int          // How many iterations per point
 

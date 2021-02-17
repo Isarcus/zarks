@@ -35,17 +35,17 @@ func NewMandelbrot(cfg Config) zmath.Map {
 // of the Mandelbrot set, TestPoint's returned int is the number if iterations it took to determine that.
 func TestPoint(point complex128, pow complex128, iter int) (isInside bool, tries int) {
 	var val complex128
-	for i := 1; i <= iter; i++ {
+	isInside = true
+	for tries < iter {
+		tries++
+
 		val = cmplx.Pow(val, pow) + point
 
 		if cmplx.Abs(val) > 2 {
 			isInside = false
-			tries = i
 			return
 		}
 	}
 
-	isInside = false
-	tries = iter
 	return
 }
