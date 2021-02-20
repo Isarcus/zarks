@@ -599,7 +599,7 @@ const (
 
 // MapFromImage returns a map of the R, G, B, or brightness values of an image
 func MapFromImage(img *image.RGBA, color Color) Map {
-	imgMap := NewMap(NewVecInt(img.Bounds().Max.X, img.Bounds().Max.Y), 0)
+	imgMap := NewMap(VI(img.Bounds().Max.X, img.Bounds().Max.Y), 0)
 
 	for x := 0; x < imgMap.Bounds().X; x++ {
 		for y := 0; y < imgMap.Bounds().Y; y++ {

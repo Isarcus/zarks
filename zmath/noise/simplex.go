@@ -50,7 +50,7 @@ func NewSimplexMap(cfg Config) zmath.Map {
 
 				// get vectors of the three corners
 				for i := 0; i < 3; i++ {
-					key := getKey(corners[i].ToInt())
+					key := getKey(corners[i].VI())
 					if angle, ok := vecMap[key]; ok { // if random angle already determined, use it
 						vectors[i] = zmath.V(math.Cos(angle), math.Sin(angle))
 					} else { // otherwise, generate one for this and future use

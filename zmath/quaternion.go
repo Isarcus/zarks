@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-// Quat represents a quaternion, a 4D complex number.
+// Quat represents a quaternion, a 4D complex number with 3 imaginary components.
 // Note that Quat's member functions will NOT modify the underlying Quat when called!
 type Quat struct {
 	A, I, J, K float64
@@ -22,7 +22,7 @@ func Q(a, i, j, k float64) Quat {
 		J: j,
 		K: k,
 	}
-}
+} // are these one-letter init functions getting out of control? Maybe... but they're so nice to work with
 
 // Add adds two quaternions
 func (q Quat) Add(v Quat) Quat {

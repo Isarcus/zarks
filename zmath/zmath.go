@@ -12,23 +12,20 @@ var (
 // - - - VEC - - - //
 //				   //
 
-// Vec is a vector.
+// Vec is a 2D float64 vector.
 // Note that Vec's member functions will NOT modify the underlying Vec when called!
 type Vec struct {
 	X, Y float64
 }
 
-// NewVec does what you think it does
-func NewVec(x, y float64) Vec {
+// V returns a new (x, y) float64 vector
+func V(x, y float64) Vec {
 	var v Vec = Vec{
 		X: x,
 		Y: y,
 	}
 	return v
 }
-
-// V returns a new Vector
-var V = NewVec
 
 // VC returns a Vec from a complex number
 func VC(c complex128) Vec {
@@ -98,17 +95,19 @@ func (v Vec) Dot(by Vec) float64 {
 	return v.X*by.X + v.Y*by.Y
 }
 
-// ToInt converts a Vec to a VecInt
-func (v Vec) ToInt() VecInt {
-	return VecInt{
-		X: int(v.X),
-		Y: int(v.Y),
-	}
-}
-
 // Slope returns the slope of the line connecting two points
 func (v Vec) Slope(pt Vec) float64 {
 	return (pt.Y - v.Y) / (pt.X - v.X)
+}
+
+// GreaterThan returns whether both X and Y of the called Vec are greater than the X and Y of the passed Vec
+func (v Vec) GreaterThan(pt Vec) bool {
+	return v.X > pt.X && v.Y > pt.Y
+}
+
+// LessThan returns whether both X and Y of the called Vec are less than the X and Y of the passed Vec
+func (v Vec) LessThan(pt Vec) bool {
+	return v.X < pt.X && v.Y < pt.Y
 }
 
 // Complex converts a Vec to a complex number, with Y being the imaginary component
@@ -118,30 +117,30 @@ func (v Vec) Complex() complex128 {
 
 // VI converts a Vec to a VecInt
 func (v Vec) VI() VecInt {
-	return v.ToInt()
+	return VecInt{
+		X: int(v.X),
+		Y: int(v.Y),
+	}
 }
 
 //				      //
 // - - - VECINT - - - //
 //				      //
 
-// VecInt is an integer vector.
+// VecInt is a 2D integer vector.
 // Note that VecInt's member functions will NOT modify the underlying VecInt when called!
 type VecInt struct {
 	X, Y int
 }
 
-// NewVecInt does what you think it does
-func NewVecInt(x, y int) VecInt {
+// VI returns a new (x, y) int vector
+func VI(x, y int) VecInt {
 	var vi VecInt = VecInt{
 		X: x,
 		Y: y,
 	}
 	return vi
 }
-
-// VI returns a new VecInt
-var VI = NewVecInt
 
 // VIC returns a VecInt from a complex number
 func VIC(c complex128) VecInt {
@@ -211,22 +210,27 @@ func (vi VecInt) Slope(pt VecInt) float64 {
 	return float64(pt.Y-vi.Y) / float64(pt.X-vi.X)
 }
 
+// GreaterThan returns whether both X and Y of the called VecInt are greater than the X and Y of the passed VecInt
+func (vi VecInt) GreaterThan(pt VecInt) bool {
+	return vi.X > pt.X && vi.Y > pt.Y
+}
+
+// LessThan returns whether both X and Y of the called VecInt are less than the X and Y of the passed VecInt
+func (vi VecInt) LessThan(pt VecInt) bool {
+	return vi.X < pt.X && vi.Y < pt.Y
+}
+
 // Complex converts a VecInt to a complex number, with Y being the imaginary component
 func (vi VecInt) Complex() complex128 {
 	return complex(float64(vi.X), float64(vi.Y))
 }
 
-// ToFloat64 converts a VecInt to a Vec
-func (vi VecInt) ToFloat64() Vec {
+// V converts a VecInt to a Vec
+func (vi VecInt) V() Vec {
 	return Vec{
 		X: float64(vi.X),
 		Y: float64(vi.Y),
 	}
-}
-
-// V converts a VecInt to a Vec
-func (vi VecInt) V() Vec {
-	return vi.ToFloat64()
 }
 
 //                  //
@@ -239,23 +243,38 @@ type Rect struct {
 	Min, Max Vec
 }
 
-// NewRect returns a new Rect. *ANY* two coordinates can be passed in in ANY order, and a correctly organized
+// R returns a new Rect. *ANY* two coordinates can be passed in in ANY order, and a correctly organized
 // Rect will still be returned.
-func NewRect(min, max Vec) *Rect {
+func R(min, max Vec) *Rect {
 	return &Rect{
 		Min: V(math.Min(min.X, max.X), math.Min(min.Y, max.Y)),
 		Max: V(math.Max(min.X, max.X), math.Max(min.Y, max.Y)),
 	}
 }
 
-// R returns a new Rect
-var R = NewRect
-
 // Dx returns the X width of a Rect
 func (r *Rect) Dx() float64 { return r.Max.X - r.Min.X }
 
 // Dy returns the Y width of a Rect
 func (r *Rect) Dy() float64 { return r.Max.Y - r.Min.Y }
+
+// Diag returns the length of the diagonal of the RectInt
+func (r *Rect) Diag() float64 { return DistanceFormula(r.Min, r.Max) }
+
+// Area returns the Rect's area
+func (r *Rect) Area() float64 { return r.Dx() * r.Dy() }
+
+// Contains returns whether the called Rectangle contains the passed point. It is min-inclusive and max-exclusive,
+// so a Rect from (0, 0) to (1, 2) ONLY contains the points (0, 0) and (0, 1). A rect where min == max will contain
+// no points and always return false.
+func (r *Rect) Contains(point Vec) bool {
+	return point.X < r.Max.X && point.X >= r.Min.X && point.Y < r.Max.Y && point.Y >= r.Min.Y
+}
+
+// Overlaps returns whether the called Rect and the passed Rect overlap at all in 2D space
+func (r *Rect) Overlaps(w Rect) bool {
+	return !(r.Min.X >= w.Max.X || r.Max.X <= w.Min.X || r.Min.Y >= w.Max.Y || r.Max.Y <= w.Min.Y)
+}
 
 // Scale scales the called Rect by the passed value, around (0, 0)
 func (r *Rect) Scale(by float64) *Rect {
@@ -271,6 +290,39 @@ func (r *Rect) Shift(by Vec) *Rect {
 	return r
 }
 
+// Expand will expand the called rectangle by the desired amount. If either value in the argument is negative, the
+// map will still be expanded, but out from it minimum coordinate(s).
+func (r *Rect) Expand(by Vec) *Rect {
+	if by.X > 0 {
+		r.Max.X += by.X
+	} else {
+		r.Min.X += by.X
+	}
+	if by.Y > 0 {
+		r.Max.Y += by.Y
+	} else {
+		r.Min.Y += by.Y
+	}
+	return r
+}
+
+// Shrink will shrink the called rectangle by the desired amount. If either value in the argument is negative, the
+// map will still be shrunk, but in from it minimum coordinate(s). It is not possible to make a Rect's Min exceed
+// its Max or its Max be less than its Min using this function, but it may be shrunk such that Min == Max.
+func (r *Rect) Shrink(by Vec) *Rect {
+	if by.X > 0 {
+		r.Max.X = math.Max(r.Min.X, r.Max.X-by.X)
+	} else {
+		r.Min.X = math.Min(r.Max.X, r.Min.X-by.X)
+	}
+	if by.Y > 0 {
+		r.Max.Y = math.Max(r.Min.Y, r.Max.Y-by.Y)
+	} else {
+		r.Min.Y = math.Min(r.Max.Y, r.Min.Y-by.Y)
+	}
+	return r
+}
+
 //				       //
 // - - - RECTINT - - - //
 //				       //
@@ -281,17 +333,14 @@ type RectInt struct {
 	Min, Max VecInt
 }
 
-// NewRectInt returns a new Rect. *ANY* two coordinates can be passed in in ANY order, and a correctly organized
+// RI returns a new Rect. *ANY* two coordinates can be passed in in ANY order, and a correctly organized
 // RectInt will still be returned.
-func NewRectInt(min, max VecInt) *RectInt {
+func RI(min, max VecInt) *RectInt {
 	return &RectInt{
 		Min: VI(MinInt(min.X, max.X), MinInt(min.Y, max.Y)),
 		Max: VI(MaxInt(min.X, max.X), MaxInt(min.Y, max.Y)),
 	}
 }
-
-// RI returns a new RectInt
-var RI = NewRectInt
 
 // Dx returns the X width of a RectInt
 func (ri *RectInt) Dx() int { return ri.Max.X - ri.Min.X }
@@ -300,14 +349,10 @@ func (ri *RectInt) Dx() int { return ri.Max.X - ri.Min.X }
 func (ri *RectInt) Dy() int { return ri.Max.Y - ri.Min.Y }
 
 // Diag returns the length of the diagonal of the RectInt
-func (ri *RectInt) Diag() float64 {
-	return DistanceFormulaInt(ri.Min, ri.Max)
-}
+func (ri *RectInt) Diag() float64 { return DistanceFormulaInt(ri.Min, ri.Max) }
 
 // Area returns the RectInt's area
-func (ri *RectInt) Area() float64 {
-	return float64(ri.Dx() * ri.Dy())
-}
+func (ri *RectInt) Area() float64 { return float64(ri.Dx() * ri.Dy()) }
 
 // Contains returns whether the called Rectangle contains the passed point. It is min-inclusive and max-exclusive,
 // so a Rect from (0, 0) to (1, 2) ONLY contains the points (0, 0) and (0, 1). A rect where min == max will contain
@@ -319,6 +364,13 @@ func (ri *RectInt) Contains(point VecInt) bool {
 // Overlaps returns whether the called rect and the passed rect overlap at all in 2D space
 func (ri *RectInt) Overlaps(w RectInt) bool {
 	return !(ri.Min.X >= w.Max.X || ri.Max.X <= w.Min.X || ri.Min.Y >= w.Max.Y || ri.Max.Y <= w.Min.Y)
+}
+
+// Shift moves a Rect by the desired amount
+func (ri *RectInt) Shift(by VecInt) *RectInt {
+	ri.Min = ri.Min.Add(by)
+	ri.Max = ri.Max.Add(by)
+	return ri
 }
 
 // Expand will expand the called rectangle by the desired amount. If either value in the argument is negative, the
@@ -351,13 +403,6 @@ func (ri *RectInt) Shrink(by VecInt) *RectInt {
 	} else {
 		ri.Min.Y = MinInt(ri.Max.Y, ri.Min.Y-by.Y)
 	}
-	return ri
-}
-
-// Shift moves a Rect by the desired amount
-func (ri *RectInt) Shift(by VecInt) *RectInt {
-	ri.Min = ri.Min.Add(by)
-	ri.Max = ri.Max.Add(by)
 	return ri
 }
 
@@ -442,7 +487,6 @@ func GetBounds(pos, size Vec) BoxInt {
 }
 
 // MinInt returns the minimum of two integers a and b, as an integer.
-// Because Go won't do it for you.
 func MinInt(a, b int) int {
 	if a < b {
 		return a
@@ -486,7 +530,7 @@ func IsWithinBounds(vi VecInt, bi BoxInt) bool {
 }
 
 // AreInRange tells you whether the passed float64 is within the range specified.
-// The range is min-inclusive, and max-non-inclusive.
+// The range is min-inclusive, and max-exclusive.
 func AreInRange(min, max float64, numbers ...float64) bool {
 	for _, num := range numbers {
 		if num < min || num >= max {
@@ -497,7 +541,7 @@ func AreInRange(min, max float64, numbers ...float64) bool {
 }
 
 // AreInRangeInt tells you whether the passed integer is within the range specified.
-// The range is min-inclusive, and max-non-inclusive.
+// The range is min-inclusive, and max-exclusive.
 func AreInRangeInt(min, max int, numbers ...int) bool {
 	for _, num := range numbers {
 		if num < min || num >= max {
@@ -520,4 +564,9 @@ func DistanceFormulaInt(v1, v2 VecInt) float64 {
 // MinMax returns the num if within range, or the min or max if it exceeds the range
 func MinMax(min, max, num float64) float64 {
 	return math.Max(min, math.Min(max, num))
+}
+
+// MinMaxInt returns the num if within range, or the min or max if it exceeds the range
+func MinMaxInt(min, max, num int) int {
+	return MaxInt(min, MinInt(max, num))
 }

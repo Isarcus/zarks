@@ -24,7 +24,7 @@ func GetContrast(inputImg *image.RGBA, radius int) *image.RGBA {
 			contrast := FuncContrastGaussian(
 				inputImg,
 				bounds,
-				zmath.NewVecInt(x, y),
+				zmath.VI(x, y),
 				circle,
 				float64(radius)/3.0,
 			)

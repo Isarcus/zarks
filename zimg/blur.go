@@ -17,14 +17,14 @@ func BlurGaussian(inputImg *image.RGBA, radius int) *image.RGBA {
 
 	// For the loop
 	circle := zmath.GetCircleCoords(radius)
-	bounds := zmath.NewBoxInt(0, 0, width, height)
+	bounds := zmath.RI(zmath.ZVI, zmath.VI(width, height))
 
 	for x := 0; x < width; x++ {
 		for y := 0; y < height; y++ {
 			blurred := FuncBlurGaussian(
 				inputImg,
 				bounds,
-				zmath.NewVecInt(x, y),
+				zmath.VI(x, y),
 				circle,
 				float64(radius)/3.0,
 			)
@@ -36,8 +36,8 @@ func BlurGaussian(inputImg *image.RGBA, radius int) *image.RGBA {
 	return outputImg
 }
 
-// FuncBlurGaussian is for gaussian blurs
-func FuncBlurGaussian(img *image.RGBA, bounds zmath.BoxInt, pos zmath.VecInt, circle []zmath.VecInt, sigma float64) color.RGBA {
+// FuncBlurGaussian will blur just a single pixel of an image Gaussly
+func FuncBlurGaussian(img *image.RGBA, rect *zmath.RectInt, pos zmath.VecInt, circle []zmath.VecInt, sigma float64) color.RGBA {
 	var r, g, b float64
 	var weightSum, trueWeightSum float64
 	var gaussCoeff float64 = 1.0 / (2.0 * math.Pi * sigma * sigma)
@@ -46,7 +46,7 @@ func FuncBlurGaussian(img *image.RGBA, bounds zmath.BoxInt, pos zmath.VecInt, ci
 		testPos := pos.Add(cpt)
 		weight := math.Pow(math.E, -1.0*float64(cpt.X*cpt.X+cpt.Y*cpt.Y)/(2*sigma*sigma))
 		trueWeightSum += weight
-		if zmath.IsWithinBounds(testPos, bounds) {
+		if rect.Contains(testPos) {
 			// weight summation
 			weightSum += weight
 

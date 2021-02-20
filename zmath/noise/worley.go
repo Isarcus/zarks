@@ -14,7 +14,7 @@ func NewWorleyMap(cfg Config) zmath.Map {
 	for x := -2; x <= 2; x++ {
 		for y := -2; y <= 2; y++ {
 			if x*y != 4 && x*y != -4 { //&& (x != 0 || y != 0) {
-				neighbors[idx] = zmath.NewVecInt(x, y)
+				neighbors[idx] = zmath.VI(x, y)
 				idx++
 			}
 		}
