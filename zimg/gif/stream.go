@@ -30,7 +30,6 @@ type stream struct {
 
 	buffer []byte
 	data   []SizedCode
-	bitLen int // size of the data, in bits
 }
 
 func newStream(colors int) *stream {
@@ -58,8 +57,7 @@ func newStream(colors int) *stream {
 
 		buffer: make([]byte, 0),
 
-		data:   data,
-		bitLen: codeLen, // bitLen starts out equal to codeLen because the code array always starts with one CC code
+		data: data,
 	}
 }
 
@@ -102,7 +100,7 @@ func getCode(num int) Code {
 }
 
 func getBytes(num int) []byte {
-	bits := zbits.Uint16ToBytes(uint16(num), zbits.BigEndian)
+	bits := zbits.Uint16ToBytes(uint16(num), zbits.BE)
 	bytes := []byte{
 		bits[0],
 		bits[1],
@@ -190,7 +188,6 @@ func (s *stream) appendBuffer() {
 	appendMe, ok := s.codeTable[bufKey]
 	if ok {
 		s.data = append(s.data, newSizedCode(appendMe, s.codeLen))
-		s.bitLen += s.codeLen
 	} else {
 		fmt.Print("Current buffer: ")
 		for _, b := range s.buffer {
@@ -208,7 +205,6 @@ func (s *stream) appendCC() {
 	cc, ok := s.codeTable[s.CC]
 	if ok {
 		s.data = append(s.data, newSizedCode(cc, s.codeLen))
-		s.bitLen += s.codeLen
 		//fmt.Println("CC Code added at index ", len(s.data)-1)
 	} else {
 		panic("No CC Code???????")

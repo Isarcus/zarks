@@ -21,7 +21,7 @@ func NewQuatBrot(cfg Config) zmath.Map {
 			quat := zmath.Quat{
 				A: coord.X,
 				I: coord.Y,
-				J: -coord.Y,
+				J: -coord.Y * coord.X,
 				K: -coord.X,
 			}
 

@@ -201,7 +201,7 @@ func (data *STLData) Save(path string) {
 	system.WriteBytes(f, data.Header[:])
 
 	// Write the number of triangles (4)
-	system.WriteBytes(f, zbits.Uint32ToBytes(data.Length, zbits.LittleEndian))
+	system.WriteBytes(f, zbits.Uint32ToBytes(data.Length, zbits.LE))
 
 	// Write the triangle data (50n)
 	for _, tri := range data.Triangles {
@@ -216,7 +216,7 @@ func (t triangle) toBytes() []byte {
 	bytesV1 := t.v1.toBytes()
 	bytesV2 := t.v2.toBytes()
 	bytesV3 := t.v3.toBytes()
-	bytesAttributes := zbits.Uint16ToBytes(t.attributes, zbits.LittleEndian)
+	bytesAttributes := zbits.Uint16ToBytes(t.attributes, zbits.LE)
 
 	final := append(bytesNormal, bytesV1...)
 	final = append(final, bytesV2...)
@@ -230,11 +230,11 @@ func (v3 vec3) toBytes() []byte {
 	var bits uint32
 
 	bits = math.Float32bits(v3.X)
-	bytesX := zbits.Uint32ToBytes(bits, zbits.LittleEndian)
+	bytesX := zbits.Uint32ToBytes(bits, zbits.LE)
 	bits = math.Float32bits(v3.Y)
-	bytesY := zbits.Uint32ToBytes(bits, zbits.LittleEndian)
+	bytesY := zbits.Uint32ToBytes(bits, zbits.LE)
 	bits = math.Float32bits(v3.Z)
-	bytesZ := zbits.Uint32ToBytes(bits, zbits.LittleEndian)
+	bytesZ := zbits.Uint32ToBytes(bits, zbits.LE)
 
 	return append(append(bytesX, bytesY...), bytesZ...)
 }

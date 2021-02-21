@@ -18,12 +18,7 @@ func (s *Stream) Size() int {
 }
 
 // Append appends to the stream
-func (s *Stream) Append(b byte) {
-	s.data = append(s.data, b)
-}
-
-// AppendX appends several bytes to the desired
-func (s *Stream) AppendX(b []byte) {
+func (s *Stream) Append(b ...byte) {
 	s.data = append(s.data, b...)
 }
 

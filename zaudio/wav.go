@@ -40,11 +40,11 @@ func (w *wav) AddData(val uint64) {
 	case 8:
 		w.bytes.Append(byte(val))
 	case 16:
-		w.bytes.AppendX(zbits.Uint16ToBytes(uint16(val), zbits.LE))
+		w.bytes.Append(zbits.Uint16ToBytes(uint16(val), zbits.LE)...)
 	case 32:
-		w.bytes.AppendX(zbits.Uint32ToBytes(uint32(val), zbits.LE))
+		w.bytes.Append(zbits.Uint32ToBytes(uint32(val), zbits.LE)...)
 	case 64:
-		w.bytes.AppendX(zbits.Uint64ToBytes(val, zbits.LE))
+		w.bytes.Append(zbits.Uint64ToBytes(val, zbits.LE)...)
 	}
 }
 
@@ -68,8 +68,8 @@ func (w *wav) GetData() []byte {
 	w.header.Paste(40, zbits.Uint32ToBytes(dataSize, zbits.LE))
 
 	stream := zbits.NewStream(0)
-	stream.AppendX(w.header.GetData())
-	stream.AppendX(w.bytes.GetData())
+	stream.Append(w.header.GetData()...)
+	stream.Append(w.bytes.GetData()...)
 
 	return stream.GetData()
 }

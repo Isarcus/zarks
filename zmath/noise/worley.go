@@ -2,7 +2,7 @@ package noise
 
 import "github.com/Isarcus/zarks/zmath"
 
-// NewWorleyMap returns a new Worley Noise map (TODO)
+// NewWorleyMap returns a new Worley Noise map (WORK IN PROGRESS)
 func NewWorleyMap(cfg Config) zmath.Map {
 	cfg.checkDefaults()
 	noiseMap := zmath.NewMap(cfg.Dimensions, 0)

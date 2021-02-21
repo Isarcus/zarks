@@ -7,25 +7,20 @@ import (
 type endian int
 
 const (
-	// BigEndian means big-endian byte order
-	BigEndian endian = iota
-	// LittleEndian means little-endian byte order
-	LittleEndian
-
 	// BE means big-endian byte order
-	BE = BigEndian
+	BE endian = iota
 	// LE means little-endian byte order
-	LE = LittleEndian
+	LE
 )
 
 // Uint64ToBytes converts a float64 to an array of eight bytes
 func Uint64ToBytes(bits uint64, bitOrder endian) []byte {
 	buf := [8]byte{}
 	switch bitOrder {
-	case BigEndian:
+	case BE:
 		binary.BigEndian.PutUint64(buf[:], bits)
 		break
-	case LittleEndian:
+	case LE:
 		binary.LittleEndian.PutUint64(buf[:], bits)
 		break
 	}
@@ -38,10 +33,10 @@ func Uint32ToBytes(bits uint32, bitOrder endian) []byte {
 	buf := [4]byte{}
 
 	switch bitOrder {
-	case BigEndian:
+	case BE:
 		binary.BigEndian.PutUint32(buf[:], bits)
 		break
-	case LittleEndian:
+	case LE:
 		binary.LittleEndian.PutUint32(buf[:], bits)
 		break
 	}
@@ -54,9 +49,9 @@ func Uint16ToBytes(bits uint16, bitOrder endian) []byte {
 	buf := [2]byte{}
 
 	switch bitOrder {
-	case BigEndian:
+	case BE:
 		binary.BigEndian.PutUint16(buf[:], bits)
-	case LittleEndian:
+	case LE:
 		binary.LittleEndian.PutUint16(buf[:], bits)
 	}
 
@@ -68,9 +63,9 @@ func BytesToUint16(data []byte, bitOrder endian) uint16 {
 	var num uint16
 
 	switch bitOrder {
-	case BigEndian:
+	case BE:
 		num = binary.BigEndian.Uint16(data)
-	case LittleEndian:
+	case LE:
 		num = binary.LittleEndian.Uint16(data)
 	}
 
@@ -82,9 +77,9 @@ func BytesToUint32(data []byte, bitOrder endian) uint32 {
 	var num uint32
 
 	switch bitOrder {
-	case BigEndian:
+	case BE:
 		num = binary.BigEndian.Uint32(data)
-	case LittleEndian:
+	case LE:
 		num = binary.LittleEndian.Uint32(data)
 	}
 
@@ -96,9 +91,9 @@ func BytesToUint64(data []byte, bitOrder endian) uint64 {
 	var num uint64
 
 	switch bitOrder {
-	case BigEndian:
+	case BE:
 		num = binary.BigEndian.Uint64(data)
-	case LittleEndian:
+	case LE:
 		num = binary.LittleEndian.Uint64(data)
 	}
 

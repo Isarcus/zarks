@@ -66,8 +66,8 @@ func NewGIF(bounds zmath.VecInt, v version, pal Pallete) *GIF {
 	// II. LOGICAL SCREEN DESCRIPTOR //
 	//-------------------------------//
 	var (
-		width  = zbits.Uint16ToBytes(uint16(bounds.X), zbits.LittleEndian)
-		height = zbits.Uint16ToBytes(uint16(bounds.Y), zbits.LittleEndian)
+		width  = zbits.Uint16ToBytes(uint16(bounds.X), zbits.LE)
+		height = zbits.Uint16ToBytes(uint16(bounds.Y), zbits.LE)
 		desc   = [7]byte{}
 	)
 	desc[0] = width[0]

@@ -636,14 +636,14 @@ func (m Map) Save(path string) {
 	// bounds (8)
 	var dimX = uint32(m.Bounds().X)
 	var dimY = uint32(m.Bounds().Y)
-	system.WriteBytes(f, zbits.Uint32ToBytes(dimX, zbits.LittleEndian))
-	system.WriteBytes(f, zbits.Uint32ToBytes(dimY, zbits.LittleEndian))
+	system.WriteBytes(f, zbits.Uint32ToBytes(dimX, zbits.LE))
+	system.WriteBytes(f, zbits.Uint32ToBytes(dimY, zbits.LE))
 
 	// Data (8n)
 	for x, row := range m {
 		for y := range row {
 			bits := math.Float64bits(m[x][y])
-			system.WriteBytes(f, zbits.Uint64ToBytes(bits, zbits.LittleEndian))
+			system.WriteBytes(f, zbits.Uint64ToBytes(bits, zbits.LE))
 		}
 	}
 }
@@ -740,5 +740,5 @@ func (m Map) Iterate() (bool, *float64) {
 	}
 
 	delete(iterhash, zeroPtr)
-	return false, zeroPtr
+	return false, nil
 }
