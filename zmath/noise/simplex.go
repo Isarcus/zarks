@@ -5,7 +5,8 @@ import (
 	"math"
 	"math/rand"
 	"strconv"
-	"zarks/zmath"
+
+	"github.com/Isarcus/zarks/zmath"
 )
 
 // dimensional transformation constants

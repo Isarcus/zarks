@@ -1,6 +1,6 @@
 package main
 
-import "zarks/alveolus"
+import "github.com/Isarcus/zarks/alveolus"
 
 func main() {
 	n := alveolus.NewNeuron()

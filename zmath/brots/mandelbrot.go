@@ -2,7 +2,8 @@ package brots
 
 import (
 	"math/cmplx"
-	"zarks/zmath"
+
+	"github.com/Isarcus/zarks/zmath"
 )
 
 // NewMandelbrot returns a new, zoomed-out mandelbrot set

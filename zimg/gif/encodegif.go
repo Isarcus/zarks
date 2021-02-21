@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"zarks/system"
-	"zarks/zimg"
-	"zarks/zmath"
-	"zarks/zmath/zbits"
+
+	"github.com/Isarcus/zarks/system"
+	"github.com/Isarcus/zarks/zimg"
+	"github.com/Isarcus/zarks/zmath"
+	"github.com/Isarcus/zarks/zmath/zbits"
 )
 
 type version string

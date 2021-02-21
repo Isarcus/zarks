@@ -7,10 +7,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"zarks/system"
-	"zarks/zimg"
-	"zarks/zmath"
-	"zarks/zmath/noise"
+
+	"github.com/Isarcus/zarks/system"
+	"github.com/Isarcus/zarks/zimg"
+	"github.com/Isarcus/zarks/zmath"
+	"github.com/Isarcus/zarks/zmath/noise"
 )
 
 type saveType int

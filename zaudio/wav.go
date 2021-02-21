@@ -1,6 +1,6 @@
 package zaudio
 
-import "zarks/zmath/zbits"
+import "github.com/Isarcus/zarks/zmath/zbits"
 
 type wav struct {
 	cfg    Config

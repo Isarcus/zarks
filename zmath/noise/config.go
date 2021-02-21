@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
-	"zarks/zmath"
+
+	"github.com/Isarcus/zarks/zmath"
 )
 
 // Config contains all of the necessary information to generate a noise map.

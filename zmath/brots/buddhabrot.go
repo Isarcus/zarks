@@ -2,7 +2,8 @@ package brots
 
 import (
 	"math/cmplx"
-	"zarks/zmath"
+
+	"github.com/Isarcus/zarks/zmath"
 )
 
 // NewBuddhaBrot will return a strange-looking map of a modified Mandelbrot algorithm!

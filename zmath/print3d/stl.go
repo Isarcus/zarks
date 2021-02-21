@@ -3,9 +3,10 @@ package print3d
 import (
 	"fmt"
 	"math"
-	"zarks/system"
-	"zarks/zmath"
-	"zarks/zmath/zbits"
+
+	"github.com/Isarcus/zarks/system"
+	"github.com/Isarcus/zarks/zmath"
+	"github.com/Isarcus/zarks/zmath/zbits"
 )
 
 type vec3 struct {

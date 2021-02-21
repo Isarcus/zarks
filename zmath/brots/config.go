@@ -1,6 +1,6 @@
 package brots
 
-import "zarks/zmath"
+import "github.com/Isarcus/zarks/zmath"
 
 // Config contains all of the information necessary to generate a custom Mandelbrot map
 type Config struct {

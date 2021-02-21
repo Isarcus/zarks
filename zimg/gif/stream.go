@@ -3,8 +3,9 @@ package gif
 import (
 	"fmt"
 	"math"
-	"zarks/zmath"
-	"zarks/zmath/zbits"
+
+	"github.com/Isarcus/zarks/zmath"
+	"github.com/Isarcus/zarks/zmath/zbits"
 )
 
 // MaxTableSize is the maximum code table size allowed by GIFs

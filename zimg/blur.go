@@ -4,7 +4,8 @@ import (
 	"image"
 	"image/color"
 	"math"
-	"zarks/zmath"
+
+	"github.com/Isarcus/zarks/zmath"
 )
 
 // BlurGaussian blurs an image!

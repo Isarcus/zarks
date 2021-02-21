@@ -4,8 +4,9 @@ import (
 	"image"
 	"image/color"
 	"math"
-	"zarks/system"
-	"zarks/zmath"
+
+	"github.com/Isarcus/zarks/system"
+	"github.com/Isarcus/zarks/zmath"
 )
 
 var (

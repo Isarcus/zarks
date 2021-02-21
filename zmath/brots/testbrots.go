@@ -2,7 +2,8 @@ package brots
 
 import (
 	"math"
-	"zarks/zmath"
+
+	"github.com/Isarcus/zarks/zmath"
 )
 
 // NewTestBrot brots a brot brotly

@@ -1,8 +1,6 @@
 package brots
 
-import (
-	"zarks/zmath"
-)
+import "github.com/Isarcus/zarks/zmath"
 
 // NewQuatBrot will use quaternion math to apply a MandelQuat formula!
 func NewQuatBrot(cfg Config) zmath.Map {

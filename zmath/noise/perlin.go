@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
-	"zarks/zmath"
+
+	"github.com/Isarcus/zarks/zmath"
 )
 
 // NewPerlinMap generates a new perlin noise map according to the specified configuration.

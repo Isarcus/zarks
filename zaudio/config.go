@@ -1,6 +1,6 @@
 package zaudio
 
-import "zarks/system"
+import "github.com/Isarcus/zarks/system"
 
 // FileFormat is a type for file formats
 type FileFormat int

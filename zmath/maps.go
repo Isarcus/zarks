@@ -6,8 +6,9 @@ import (
 	"image"
 	"math"
 	"os"
-	"zarks/system"
-	"zarks/zmath/zbits"
+
+	"github.com/Isarcus/zarks/system"
+	"github.com/Isarcus/zarks/zmath/zbits"
 )
 
 // Map is a set of 2D raster data, with some helpful member functions

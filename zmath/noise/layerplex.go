@@ -5,8 +5,9 @@ import (
 	"image"
 	"math"
 	"math/rand"
-	"zarks/zimg"
-	"zarks/zmath"
+
+	"github.com/Isarcus/zarks/zimg"
+	"github.com/Isarcus/zarks/zmath"
 )
 
 // NewLayerplexMap returns a newly generated simplex map, with a slightly modified algorithm.

@@ -1,6 +1,6 @@
 package zscript
 
-import "zarks/zmath"
+import "github.com/Isarcus/zarks/zmath"
 
 // Object is the interface type of all zscript variables, somewhat a la Python
 type Object interface {

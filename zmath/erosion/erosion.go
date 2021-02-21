@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+// Let's call this a work in progress
+
 // Config contains basic erosion parameters
 type Config struct {
 	Seed     int64

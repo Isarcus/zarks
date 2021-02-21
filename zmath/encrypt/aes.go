@@ -3,7 +3,8 @@ package encrypt
 import (
 	"crypto/aes"
 	"crypto/cipher"
-	"zarks/zmath"
+
+	"github.com/Isarcus/zarks/zmath"
 )
 
 // AESProtocol specifies the length of an AES key (bits in the name, bytes in the value)

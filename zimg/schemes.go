@@ -5,7 +5,8 @@ import (
 	"image"
 	"image/color"
 	"math"
-	"zarks/zmath"
+
+	"github.com/Isarcus/zarks/zmath"
 )
 
 // Colorify returns an image colored according to the provided Map and ColorScheme

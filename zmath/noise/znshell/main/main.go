@@ -1,6 +1,6 @@
 package main
 
-import "zarks/zmath/noise/znshell"
+import "github.com/Isarcus/zarks/zmath/noise/znshell"
 
 func main() {
 	znshell.RunShell()

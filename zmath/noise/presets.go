@@ -2,7 +2,8 @@ package noise
 
 import (
 	"math"
-	"zarks/zmath"
+
+	"github.com/Isarcus/zarks/zmath"
 )
 
 // Riverplex is useful for lots of rivers
