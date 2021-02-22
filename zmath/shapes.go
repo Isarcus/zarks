@@ -3,15 +3,29 @@ package zmath
 import "math"
 
 // GetCircleCoords returns an array of vectors representing all points within a circle of the specified radius.
-// The list is edge-inclusive.
-func GetCircleCoords(radius int) []VecInt {
-	points := make([]VecInt, 0, int(radius*radius*4)) // because pi = 4, more or less
+// If any points for the 'at' argument are provided, the points returned will be for circles centered around
+// those points instead of assuming (0, 0) as the center.
+func GetCircleCoords(radius int, at ...VecInt) []VecInt {
+	points := make([]VecInt, 0, int(radius*radius*4)*MaxInt(1, len(at))) // because pi = 4, more or less
 
-	for x := -radius; x <= radius; x++ {
-		for y := -radius; y <= radius; y++ {
-			pos := VI(x, y)
-			if DistanceFormulaInt(VI(x, y), ZVI) <= float64(radius) {
-				points = append(points, pos)
+	if len(at) == 0 { // assume (0, 0)
+		for x := -radius; x <= radius; x++ {
+			for y := -radius; y <= radius; y++ {
+				pos := VI(x, y)
+				if DistanceFormulaInt(VI(x, y), ZVI) <= float64(radius) {
+					points = append(points, pos)
+				}
+			}
+		}
+	} else {
+		for _, center := range at {
+			for x := -radius; x <= radius; x++ {
+				for y := -radius; y <= radius; y++ {
+					pos := VI(x, y)
+					if DistanceFormulaInt(VI(x, y), ZVI) <= float64(radius) {
+						points = append(points, pos.Add(center))
+					}
+				}
 			}
 		}
 	}

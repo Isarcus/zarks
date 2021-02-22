@@ -190,7 +190,7 @@ func (s Set) MakeUniform() Set {
 }
 
 // Sort sorts a Set with a quicksort implementation
-func (s Set) Sort() Set { // this is copied code but it works beautifully
+func (s Set) Sort() Set {
 	if len(s) < 2 {
 		return s
 	}
@@ -209,7 +209,7 @@ func (s Set) Sort() Set { // this is copied code but it works beautifully
 
 	s[left], s[right] = s[right], s[left]
 
-	// Recursively call function
+	// Recursively call sort
 	Set(s[:left]).Sort()
 	Set(s[left+1:]).Sort()
 
